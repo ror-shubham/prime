@@ -10,7 +10,7 @@ class Frame(ui.MainFrame):
     def __init__(self, parent):
         ui.MainFrame.__init__(self, parent)
 
-    def loadLas(self, event):
+    def load_las(self, event):
         openFileDialog = wx.FileDialog(self, "Open", "", "",
                                        "LAS files (*.las)|*.las",
                                        wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
