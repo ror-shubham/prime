@@ -7,7 +7,6 @@ import tempfile
 def convert_to_csv(read_path, write_path):
     print(write_path)
     f1 = open(write_path, "w")
-    # f1 = open('output.txt', "w")
 
     with open(read_path, "r") as lasFile:
         for line in lasFile:
@@ -35,7 +34,7 @@ def version_and_curve_info(read_path):
                     arrStr = line.split(".", maxsplit=1)
                     if arrStr[0].strip().lower() == "vers":
                         version = arrStr[1].strip().split(":")[0].strip()
-                        if not (version == '2.00' or version == 2.0):
+                        if not (version == '2.00' or version == '2.0'):
                             raise Exception("Only version 2.0 supported. Version of file = " + version)
                 elif section == 'c':
                     column = line.split('.')[0].strip()
@@ -46,16 +45,23 @@ def version_and_curve_info(read_path):
 class ReadLas:
     def __init__(self, read_path):
         self.read_path = read_path
-
-    def convert_to_df(self):
         columns = version_and_curve_info(self.read_path)
         fd, write_path = tempfile.mkstemp()
         try:
             convert_to_csv(self.read_path, write_path)
         except:
             os.unlink(write_path)
+        # converting to csv, write to file, read whole file using read_csv, and delete csv file. Because reading from
+        # csv is faster
         convert_to_csv(self.read_path, write_path)
-        df = pd.read_csv(write_path, sep='\s+', names=columns)
+        self.df = pd.read_csv(write_path, sep='\s+', names=columns)
         os.unlink(write_path)
-        df.set_index(columns[0], inplace=True)
-        return df
+        self.df.set_index(columns[0], inplace=True)
+
+    def get_begin_depth(self):
+        return self.df.index.min()
+
+    def get_end_depth(self):
+        return self.df.index.max()
+
+

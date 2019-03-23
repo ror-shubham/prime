@@ -2,6 +2,8 @@ import wx
 from readLas import ReadLas
 from log_plot import PlotDemoApp
 import numpy as np
+import wx.lib.inspection
+from well_select_dialog import SelectWellDialog
 
 import ui
 
@@ -9,8 +11,18 @@ import ui
 class Frame(ui.MainFrame):
     def __init__(self, parent):
         ui.MainFrame.__init__(self, parent)
+        # in form of {wellId: [las1, ...]}
+        self.wells = {}
+        self.well_to_tree = {}
 
     def load_las(self, event):
+        dlg = SelectWellDialog(self, list(self.wells.keys()))
+        dlg.SetSize(250,-1)
+        dlg.CenterOnScreen()
+        val = dlg.ShowModal()
+        if val != wx.ID_OK:
+            return
+        selected = dlg.get_selection()
         openFileDialog = wx.FileDialog(self, "Open", "", "",
                                        "LAS files (*.las)|*.las",
                                        wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
@@ -18,26 +30,35 @@ class Frame(ui.MainFrame):
         path = openFileDialog.GetPath()
 
         lasObj = ReadLas(path)
-        self.df = lasObj.convert_to_df()
+        self.df = lasObj.df
+        # TODO handle nan values implicitly
         self.df = self.df.replace(-999.2500, np.nan)
-        self.ls = ["a", "b", "c"]
+        if selected in self.wells:
+            self.wells[selected].append(lasObj)
+            child_tree = self.well_to_tree[selected]
+            beg = lasObj.get_begin_depth()
+            end = lasObj.get_end_depth()
+            self.add_las_to_well(child_tree, str(beg) + " - " + str(end))
+            self.left_tree.ExpandAll()
+
+        else:
+            self.wells[selected] = [lasObj]
+            child_tree = self.add_well(self.root, selected)
+            self.well_to_tree[selected] = child_tree
+            beg = lasObj.get_begin_depth()
+            end = lasObj.get_end_depth()
+            self.add_las_to_well(child_tree, str(beg) + " - " + str(end))
+            self.left_tree.ExpandAll()
+
         self.log_plot_menu.Enable(True)
 
-    def plot_log( self, event ):
+    def plot_log(self, event):
         PlotDemoApp(self.df)
 
-    def add_check_boxes (self, frame):
-        ui.MainFrame.m_checkBox4 = wx.CheckBox(self, wx.ID_ANY, u"Check Me---!", wx.DefaultPosition, wx.DefaultSize, 0)
-        ui.MainFrame.m_checkBox4.SetValue(True)
-        a = ui.MainFrame.GetSizer(frame)
-        a.Add(ui.MainFrame.m_checkBox4, 0, wx.ALL, 5)
 
-
-
-
-
-app = wx.App(False)
-frame = Frame(None)
-frame.Show(True)
-# start the applications
-app.MainLoop()
+if __name__ == "__main__":
+    app = wx.App(False)
+    frame = Frame(None)
+    frame.Show(True)
+    wx.lib.inspection.InspectionTool().Show()
+    app.MainLoop()
