@@ -25,7 +25,6 @@ class MainFrame(wx.Frame):
         self.plot_menu = wx.Menu()
         self.log_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Log Plot")
         self.plot_menu.Append(self.log_plot_menu)
-        self.log_plot_menu.Enable(False)
         self.cross_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Cross Plot")
         self.plot_menu.Append(self.cross_plot_menu)
         self.tools_menu.AppendSubMenu(self.plot_menu, u"Plot")
@@ -41,7 +40,7 @@ class MainFrame(wx.Frame):
         panel_left.SetSizer(self.box_left)
         self.staticText1 = wx.StaticText(self, label="Projects:")
 
-        self.left_tree = CT.CustomTreeCtrl(self)
+        self.left_tree = CT.CustomTreeCtrl(self, agwStyle = CT.TR_AUTO_CHECK_CHILD | CT.TR_AUTO_CHECK_PARENT)
         self.box_left.Add(self.left_tree, 1, wx.EXPAND, border=5)
         self.root = self.left_tree.AddRoot("Wells")
 
@@ -60,19 +59,23 @@ class MainFrame(wx.Frame):
         # Connect Events
         self.Bind(wx.EVT_MENU, self.load_las, id=self.load_menu.GetId())
         self.Bind(wx.EVT_MENU, self.plot_log, id=self.log_plot_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.cross_plot, id=self.cross_plot_menu.GetId())
 
     def __del__(self):
         pass
 
-    # Virtual event handlers, overide them in your derived class
+    # Virtual event handlers, override them in your derived class
     def load_las(self, event):
         event.Skip()
 
     def plot_log(self, event):
         event.Skip()
 
+    def cross_plot(self, event):
+        event.Skip()
+
     def add_well(self, tree, name):
-        return self.left_tree.AppendItem(self.root, name, ct_type=2)
+        return self.left_tree.AppendItem(self.root, name, ct_type=1)
 
     def add_las_to_well(self, tree, name):
         return self.left_tree.AppendItem(tree, name, ct_type=1)
