@@ -71,7 +71,7 @@ class PlotCanvas(wx.Frame):
         box_nav.Add(toolbar)
         panel_nav.SetSizer(box_nav)
         toolbar.Realize()
-        self.box_main.Add(panel_nav, 0, wx.CENTER)
+        self.box_main.Add(box_nav, 0, wx.CENTER)
         self.box_lower.Add(box_local, 1, wx.EXPAND)
 
         self.box_main.Add(panel_lower, 1, wx.EXPAND)
