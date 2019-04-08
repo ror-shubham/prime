@@ -49,6 +49,7 @@ class PlotCanvas(wx.Frame):
         plt = Figure(figsize=(95,10))
         num_columns = len(data.columns)
         axes_1 = plt.add_subplot(1, num_columns, 1)
+        axes_1.set(xlabel=data.columns[0], ylabel='Depth', title='Depth vs ' + data.columns[0])
         data_numpy = data[data.columns[0]].to_numpy()
         depth = data.index.to_numpy()
         plt.gca().invert_yaxis()
@@ -59,8 +60,6 @@ class PlotCanvas(wx.Frame):
             axes_tmp.set(xlabel=data.columns[i], ylabel='Depth', title='Depth vs ' + data.columns[i])
 
             data_numpy = data[data.columns[i]].to_numpy()
-
-            plt.gca().invert_yaxis()
             axes_tmp.plot(data_numpy, depth)
         canvas = FigureCanvas(panel_lower, -1, plt)
         canvas.draw()

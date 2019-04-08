@@ -86,12 +86,14 @@ class PlotCanvas(wx.Frame):
         box_local = wx.BoxSizer(wx.VERTICAL)
         plt = Figure(figsize=(20,10))
         num_columns = len(df_arr)
+
+        depth1 = df_arr[0].index.to_numpy()
         axes_1 = plt.add_subplot(1, num_columns, 1)
-        # data_numpy = data[data.columns[0]].to_numpy()
+        axes_1.set(xlabel=df_field, ylabel='Depth', title='Depth vs ' + df_field)
+        data_numpy = df_arr[0][df_field].to_numpy()
         plt.gca().invert_yaxis()
-        plt.subplots_adjust(left=0.01, right=1.00, top=0.95, bottom=0.05)
-        depth = df_arr[0].index.to_numpy()
-        axes_1.plot(df_arr[0][df_field].to_numpy(), depth)
+        plt.subplots_adjust(left=0.05, right=1.00, top=0.95, bottom=0.05)
+        axes_1.plot(data_numpy, depth1)
         for i in range(1, num_columns):
             depth = df_arr[i].index.to_numpy()
             axes_tmp = plt.add_subplot(1, num_columns, i+1, sharey=axes_1)
@@ -99,7 +101,6 @@ class PlotCanvas(wx.Frame):
 
             data_numpy = df_arr[i][df_field].to_numpy()
 
-            plt.gca().invert_yaxis()
             axes_tmp.plot(data_numpy, depth)
         canvas = FigureCanvas(panel_lower, -1, plt)
         canvas.draw()
