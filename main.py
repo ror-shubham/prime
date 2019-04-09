@@ -4,6 +4,8 @@ from log_plot import PlotDemoApp
 import numpy as np
 import wx.lib.inspection
 from well_select_dialog import SelectWellDialog
+from prediction_ui import PredictionDialog
+from validation_ui import ValidationDialog
 from cross_plot import SelectCrossPlotField, PlotCross
 
 import ui
@@ -16,6 +18,7 @@ class Frame(ui.MainFrame):
         self.wells = {}
         self.well_to_tree = {}
         self.selected_dict = {}
+        self.selected_df_list = []
 
     def load_las(self, event):
         dlg = SelectWellDialog(self, list(self.wells.keys()))
@@ -56,53 +59,66 @@ class Frame(ui.MainFrame):
 
     def plot_log(self, event):
         selected = self.get_selected()
-        num_selected = 0
-        for val in selected.values():
-            num_selected += len(val)
+        num_selected = len(selected)
         if num_selected == 1:
-            selected_key = list(selected.keys())[0]
-            b = selected[selected_key]
-            df = self.wells[selected_key][selected[selected_key][0]].df
+            df = selected[0]
             PlotDemoApp(df)
         # TODO add a dialogue if num_selected != 1
 
     def cross_plot(self, event):
-        selected = self.get_selected()
-        col_arr = []
-        df_arr = []
+
         # TODO assumption here: only one LAS selected per well
-        for k in selected.keys():
-            if len(selected[k]) == 1:
-                col_arr.append(self.wells[k][0].df.columns)
-                df_arr.append(self.wells[k][0].df)
+
         # TODO assumption: at least one is selected
-        common_fields = col_arr[0]
-        for col in col_arr:
-            common_fields = common_fields.intersection(col)
-        dlg = SelectCrossPlotField(self, common_fields.tolist())
+        common_fields = self._get_common_fields()
+        dlg = SelectCrossPlotField(self, common_fields)
         dlg.SetSize(250, -1)
         dlg.CenterOnScreen()
         val = dlg.ShowModal()
         if val != wx.ID_OK:
             return
         choice_field = dlg.get_selection()
+        df_arr = self.get_selected()
         PlotCross(df_arr, choice_field)
 
+    def _get_common_fields(self):
+        col_arr = []
+        selected_list = self.get_selected()
+        for selected in selected_list:
+            col_arr.append(selected.columns)
+        common_fields = col_arr[0]
+        for col in col_arr:
+            common_fields = common_fields.intersection(col)
+        return common_fields.tolist()
 
     def get_selected(self):
+        self.selected_df_list = []
         self.selected_dict = {}
         for well_name in self.well_to_tree:
-            print(well_name)
             tree = self.well_to_tree[well_name]
             children = tree.GetChildren()
             for index, child in enumerate(children):
                 if child.IsChecked():
+                    self.selected_df_list.append(self.wells[well_name][index].df)
                     if well_name in self.selected_dict:
                         if index not in self.selected_dict[well_name]:
                             self.selected_dict[well_name].append(index)
                     else:
                         self.selected_dict[well_name] = [index]
-        return self.selected_dict
+        return self.selected_df_list
+
+    def on_prediction(self, event):
+        common_fields = self._get_common_fields()
+        dlg2 = PredictionDialog(self, common_fields)
+        val2 = dlg2.ShowModal()
+        selected = self.get_selected()
+        # TODO run prediction here
+
+    def on_validation(self, event):
+        common_fields = self._get_common_fields()
+        dlg2 = ValidationDialog(self, common_fields)
+        val2 = dlg2.ShowModal()
+        # TODO run prediction here
 
 
 if __name__ == "__main__":

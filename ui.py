@@ -23,11 +23,19 @@ class MainFrame(wx.Frame):
 
         self.tools_menu = wx.Menu()
         self.plot_menu = wx.Menu()
+
         self.log_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Log Plot")
         self.plot_menu.Append(self.log_plot_menu)
         self.cross_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Cross Plot")
         self.plot_menu.Append(self.cross_plot_menu)
         self.tools_menu.AppendSubMenu(self.plot_menu, u"Plot")
+
+        self.interpolation_menu = wx.Menu()
+        self.validation_menu = wx.MenuItem(self.interpolation_menu, wx.ID_ANY, u"Validation")
+        self.interpolation_menu.Append(self.validation_menu)
+        self.prediction_menu = wx.MenuItem(self.interpolation_menu, wx.ID_ANY, u"Prediction")
+        self.interpolation_menu.Append(self.prediction_menu)
+        self.tools_menu.AppendSubMenu(self.interpolation_menu, u"Interpolate")
         self.menubar.Append(self.tools_menu, u"Tools")
 
         self.SetMenuBar(self.menubar)
@@ -44,7 +52,6 @@ class MainFrame(wx.Frame):
         self.box_left.Add(self.left_tree, 1, wx.EXPAND, border=5)
         self.root = self.left_tree.AddRoot("Wells")
 
-
         self.left_tree.ExpandAll()
 
         self.box_main.Add(panel_left, 1, wx.EXPAND)
@@ -60,6 +67,8 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.load_las, id=self.load_menu.GetId())
         self.Bind(wx.EVT_MENU, self.plot_log, id=self.log_plot_menu.GetId())
         self.Bind(wx.EVT_MENU, self.cross_plot, id=self.cross_plot_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.on_prediction, id=self.prediction_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.on_validation, id=self.validation_menu.GetId())
 
     def __del__(self):
         pass
@@ -79,3 +88,9 @@ class MainFrame(wx.Frame):
 
     def add_las_to_well(self, tree, name):
         return self.left_tree.AppendItem(tree, name, ct_type=1)
+
+    def on_prediction(self, event):
+        event.Skip()
+
+    def on_validation(self, event):
+        event.Skip()
