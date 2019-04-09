@@ -23,20 +23,17 @@ class GenericPlot(object):
         self.app.MainLoop()
 
 
-class PlotCanvas(wx.Frame):
+class PlotCanvas(wx.Dialog):
     def __init__(self, parent, wxid, frame_title, plot_titles, x_ndarr, y_ndarr, x_labels, y_labels):
         # x_ndarr = array of x_data or 1d array if x axis is common
         # y_ndarr = array of y_data
         # x_labels = list of x_labels or a single string if common
         # y_labels = list of y_labels or a single string if common
-        a = x_ndarr
-        b = np.asarray(x_ndarr)
-        c = b.ndim
         is_xaxis_common = not(isinstance(x_ndarr[0], list) or isinstance(x_ndarr[0], np.ndarray))
         is_ylabel_common = not isinstance(y_labels, list)
         is_xlabel_common = not isinstance(x_labels, list)
 
-        wx.Frame.__init__(self, parent, wxid, frame_title)
+        wx.Dialog.__init__(self, parent, wxid, frame_title, style=wx.DEFAULT_DIALOG_STYLE|wx.MAXIMIZE_BOX|wx.MINIMIZE_BOX|wx.RESIZE_BORDER )
 
         self.box_main = wx.BoxSizer(wx.VERTICAL)
 
