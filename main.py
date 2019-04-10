@@ -7,6 +7,8 @@ from well_select_dialog import SelectWellDialog
 from prediction_ui import PredictionDialog
 from validation_ui import ValidationDialog
 from cross_plot import SelectCrossPlotField, PlotCross
+from ml import karnal
+from sklearn.ensemble import RandomForestRegressor
 
 import ui
 
@@ -112,12 +114,18 @@ class Frame(ui.MainFrame):
         dlg2 = PredictionDialog(self, common_fields)
         val2 = dlg2.ShowModal()
         selected = self.get_selected()
+        a =  karnal.prediction(selected, 'BS', 12, RandomForestRegressor)
+        c = 1
+
         # TODO run prediction here
 
     def on_validation(self, event):
         common_fields = self._get_common_fields()
         dlg2 = ValidationDialog(self, common_fields)
         val2 = dlg2.ShowModal()
+        selected = self.get_selected()
+        a = karnal.validation(selected, 'BS', RandomForestRegressor, 'r2')
+        print(a)
         # TODO run prediction here
 
 
