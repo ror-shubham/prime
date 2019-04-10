@@ -2,7 +2,7 @@ import wx
 import wx.lib.scrolledpanel
 
 import matplotlib
-from generic_plot import PlotCanvas
+from plots.generic_plot import PlotCanvas
 
 import wx.lib.inspection
 

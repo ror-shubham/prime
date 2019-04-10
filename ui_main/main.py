@@ -1,16 +1,16 @@
 import wx
-from readLas import ReadLas
-from log_plot import PlotDemoApp
+from utils.readLas import ReadLas
+from plots.log_plot import PlotDemoApp
 import numpy as np
 import wx.lib.inspection
-from well_select_dialog import SelectWellDialog
-from prediction_ui import PredictionDialog
-from validation_ui import ValidationDialog
-from cross_plot import SelectCrossPlotField, PlotCross
+from ui_main.las.load_las.well_select_dialog import SelectWellDialog
+from ui_main.tools.interpolate.prediction.prediction_dialog import PredictionDialog
+from ui_main.tools.interpolate.validation.validation_dialog import ValidationDialog
+from plots.cross_plot import SelectCrossPlotField, PlotCross
 from ml import karnal
 from sklearn.ensemble import RandomForestRegressor
 
-import ui
+from ui_main import ui
 
 
 class Frame(ui.MainFrame):
