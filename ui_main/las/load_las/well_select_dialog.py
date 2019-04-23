@@ -35,5 +35,5 @@ class SelectWellDialog(wx.Dialog):
 
         self.Centre(wx.BOTH)
 
-    def get_selection(self):
+    def get_well_name(self):
         return self.combo_box.GetValue()

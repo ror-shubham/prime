@@ -1,58 +1,79 @@
+import pickle
+
 import wx
 from utils.readLas import ReadLas
 from plots.log_plot import PlotDemoApp
 import numpy as np
 import wx.lib.inspection
+from plots.cross_plot import SelectCrossPlotField, PlotCross
+from ml import main
+from sklearn.ensemble import RandomForestRegressor
+
+from ui_main import main_ui
+
 from ui_main.las.load_las.well_select_dialog import SelectWellDialog
 from ui_main.tools.interpolate.prediction.prediction_dialog import PredictionDialog
 from ui_main.tools.interpolate.validation.validation_dialog import ValidationDialog
-from plots.cross_plot import SelectCrossPlotField, PlotCross
-from ml import karnal
-from sklearn.ensemble import RandomForestRegressor
+from ui_main.file.new_project import NewProjectDialog
+from ui_main.file.open_project import open_project_dlg
+from ui_main.initial_dialog import InitialDialog
+from ui_main.file.save_project import save_project_to_file
 
-from ui_main import ui
+import matplotlib as mpl
+from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
+from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
 
 
-class Frame(ui.MainFrame):
-    def __init__(self, parent):
-        ui.MainFrame.__init__(self, parent)
-        # in form of {wellId: [las1, ...]}
+class Frame(main_ui.MainFrame):
+    def __init__(self, parent, project_path):
         self.wells = {}
         self.well_to_tree = {}
         self.selected_dict = {}
         self.selected_df_list = []
+        self.project_name = ''
+        self.project_path = project_path
 
-    def load_las(self, event):
+        main_ui.MainFrame.__init__(self, parent, project_path)
+        # read the project file first
+        with open(project_path, 'rb') as f:
+            well_path_dict = pickle.load(f)
+        for well_name in well_path_dict:
+            for path in well_path_dict[well_name]:
+                self.load_las_logic(path, well_name)
+
+    def load_las_dlg(self, event):
         dlg = SelectWellDialog(self, list(self.wells.keys()))
         dlg.SetSize(250,-1)
         dlg.CenterOnScreen()
         val = dlg.ShowModal()
         if val != wx.ID_OK:
             return
-        selected = dlg.get_selection()
+        well_name = dlg.get_well_name()
         openFileDialog = wx.FileDialog(self, "Open", "", "",
                                        "LAS files (*.las)|*.las",
                                        wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         openFileDialog.ShowModal()
         path = openFileDialog.GetPath()
+        self.load_las_logic(path, well_name)
 
+    def load_las_logic(self, path, well_name):
         lasObj = ReadLas(path)
         lasObj.df = lasObj.df.replace(-999.2500, np.nan)
         # self.df = lasObj.df.replace(-999.2500, np.nan)
         # TODO handle nan values implicitly
         # self.df = self.df.replace(-999.2500, np.nan)
-        if selected in self.wells:
-            self.wells[selected].append(lasObj)
-            child_tree = self.well_to_tree[selected]
+        if well_name in self.wells:
+            self.wells[well_name].append(lasObj)
+            child_tree = self.well_to_tree[well_name]
             beg = lasObj.get_begin_depth()
             end = lasObj.get_end_depth()
             self.add_las_to_well(child_tree, str(beg) + " - " + str(end))
             self.left_tree.ExpandAll()
 
         else:
-            self.wells[selected] = [lasObj]
-            child_tree = self.add_well(self.root, selected)
-            self.well_to_tree[selected] = child_tree
+            self.wells[well_name] = [lasObj]
+            child_tree = self.add_well(self.root, well_name)
+            self.well_to_tree[well_name] = child_tree
             beg = lasObj.get_begin_depth()
             end = lasObj.get_end_depth()
             self.add_las_to_well(child_tree, str(beg) + " - " + str(end))
@@ -114,8 +135,8 @@ class Frame(ui.MainFrame):
         dlg2 = PredictionDialog(self, common_fields)
         val2 = dlg2.ShowModal()
         selected = self.get_selected()
-        a =  karnal.prediction(selected, 'BS', 12, RandomForestRegressor)
-        c = 1
+        self.predicted_df =  main.prediction(selected, 'CALI', 22, RandomForestRegressor)
+        a=1
 
         # TODO run prediction here
 
@@ -124,13 +145,36 @@ class Frame(ui.MainFrame):
         dlg2 = ValidationDialog(self, common_fields)
         val2 = dlg2.ShowModal()
         selected = self.get_selected()
-        a = karnal.validation(selected, 'BS', RandomForestRegressor, 'r2')
+        a = main.validation(selected, 'BS', RandomForestRegressor, 'r2')
         print(a)
         # TODO run prediction here
+
+    def new_project(self, event):
+        dlg = NewProjectDialog(self)
+        dlg.SetSize(450, 80)
+        dlg.CenterOnScreen()
+        val = dlg.ShowModal()
+        if val != wx.ID_OK:
+            return
+        # name = os.path.basename(path)
+        # self.project_name = name
+        # self.project_path = path
+
+    def open_project(self, event):
+        open_project_dlg(self)
+
+    def save_project(self, event):
+        wells_modified = {k: list(map(lambda x: x.read_path, v)) for k, v in self.wells.items()}
+        save_project_to_file(wells_modified, self.project_path)
 
 
 if __name__ == "__main__":
     app = wx.App(False)
-    frame = Frame(None)
+    dlg = InitialDialog(None)
+    dlg.ShowModal()
+    project_path = dlg.get_project_path()
+
+    frame = Frame(None, project_path)
     frame.Show(True)
+    wx.lib.inspection.InspectionTool().Show()
     app.MainLoop()

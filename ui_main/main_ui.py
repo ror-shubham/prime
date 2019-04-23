@@ -1,10 +1,13 @@
+import os
+
 import wx
 import wx.xrc
 import wx.lib.agw.customtreectrl as CT
 
 
 class MainFrame(wx.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, project_path):
+        project_name = os.path.basename(project_path)[:-6]  # [:-6] remove '.prime' from name
         wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=u"First frame", pos=wx.DefaultPosition,
                           size=wx.Size(500, 300), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
 
@@ -12,6 +15,12 @@ class MainFrame(wx.Frame):
         self.menubar = wx.MenuBar(0)
 
         self.file_menu = wx.Menu()
+        self.new_project_menu = wx.MenuItem(self.file_menu, wx.ID_NEW, u"New Project")
+        self.file_menu.Append(self.new_project_menu)
+        self.save_project_menu = wx.MenuItem(self.file_menu, wx.ID_SAVE, u"Save Project")
+        self.file_menu.Append(self.save_project_menu)
+        self.open_project_menu = wx.MenuItem(self.file_menu, wx.ID_OPEN, u"Open Project")
+        self.file_menu.Append(self.open_project_menu)
         self.exit_menu = wx.MenuItem(self.file_menu, wx.ID_EXIT, u"Exit")
         self.file_menu.Append(self.exit_menu)
         self.menubar.Append(self.file_menu, u"File")
@@ -35,6 +44,8 @@ class MainFrame(wx.Frame):
         self.interpolation_menu.Append(self.validation_menu)
         self.prediction_menu = wx.MenuItem(self.interpolation_menu, wx.ID_ANY, u"Prediction")
         self.interpolation_menu.Append(self.prediction_menu)
+        self.plot_3d_menu = wx.MenuItem(self.interpolation_menu, wx.ID_ANY, u"3d Plot")
+        self.interpolation_menu.Append(self.plot_3d_menu)
         self.tools_menu.AppendSubMenu(self.interpolation_menu, u"Interpolate")
         self.menubar.Append(self.tools_menu, u"Tools")
 
@@ -50,31 +61,46 @@ class MainFrame(wx.Frame):
 
         self.left_tree = CT.CustomTreeCtrl(self, agwStyle = CT.TR_AUTO_CHECK_CHILD | CT.TR_AUTO_CHECK_PARENT)
         self.box_left.Add(self.left_tree, 1, wx.EXPAND, border=5)
-        self.root = self.left_tree.AddRoot("Wells")
+        self.root = self.left_tree.AddRoot(project_name)
 
         self.left_tree.ExpandAll()
 
         self.box_main.Add(panel_left, 1, wx.EXPAND)
-        panel_right = wx.Panel(self)
+        self.panel_right = wx.Panel(self)
 
-        self.box_main.Add(panel_right, 4, wx.EXPAND)
+        self.box_right = wx.BoxSizer(wx.VERTICAL)
+        panel_left.SetSizer(self.box_right)
+        self.box_main.Add(self.panel_right, 4, wx.EXPAND)
 
         self.SetSizer(self.box_main)
         self.Centre(wx.BOTH)
         self.Maximize()
 
         # Connect Events
-        self.Bind(wx.EVT_MENU, self.load_las, id=self.load_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.new_project, id=self.new_project_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.save_project, id=self.save_project_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.open_project, id=self.open_project_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.load_las_dlg, id=self.load_menu.GetId())
         self.Bind(wx.EVT_MENU, self.plot_log, id=self.log_plot_menu.GetId())
         self.Bind(wx.EVT_MENU, self.cross_plot, id=self.cross_plot_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_prediction, id=self.prediction_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_validation, id=self.validation_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.on_3d_plot, id=self.plot_3d_menu.GetId())
 
     def __del__(self):
         pass
 
     # Virtual event handlers, override them in your derived class
-    def load_las(self, event):
+    def new_project(self, event):
+        event.Skip()
+
+    def save_project(self, event):
+        event.Skip()
+
+    def open_project(self, event):
+        event.Skip()
+
+    def load_las_dlg(self, event):
         event.Skip()
 
     def plot_log(self, event):
@@ -93,4 +119,7 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def on_validation(self, event):
+        event.Skip()
+
+    def on_3d_plot(self, event):
         event.Skip()
