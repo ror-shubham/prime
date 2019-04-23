@@ -167,6 +167,17 @@ class Frame(main_ui.MainFrame):
         wells_modified = {k: list(map(lambda x: x.read_path, v)) for k, v in self.wells.items()}
         save_project_to_file(wells_modified, self.project_path)
 
+    def on_3d_plot(self, event):
+        from numpy import arange, sin, pi
+        t = arange(0.0, 3.0, 0.01)
+        s = sin(2 * pi * t)
+        self.figure = mpl.figure.Figure()
+        self.canvas_main = FigureCanvas(self.panel_right, -1, self.figure)
+        self.box_right.Add(self.canvas_main, 1, wx.LEFT | wx.TOP | wx.GROW)
+        self.axes_figure = self.figure.add_subplot(111)
+        self.axes_figure.plot(t, s)
+        self.box_right.Layout()
+
 
 if __name__ == "__main__":
     app = wx.App(False)

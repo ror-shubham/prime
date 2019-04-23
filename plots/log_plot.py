@@ -4,8 +4,6 @@ import wx.lib.scrolledpanel
 import matplotlib
 from plots.generic_plot import PlotCanvas
 
-import wx.lib.inspection
-
 matplotlib.use('WXAgg')
 
 
@@ -18,6 +16,5 @@ class PlotDemoApp(object):
 
         self.frame = PlotCanvas(None, -1, "Log Plot", plot_titles, x_ndarr, y_ndarr, "Depth", list(data.columns.values))
         self.frame.Show(True)
-        wx.lib.inspection.InspectionTool().Show()
         self.app.MainLoop()
 

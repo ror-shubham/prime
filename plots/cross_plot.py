@@ -6,8 +6,6 @@ import matplotlib
 
 from plots.generic_plot import PlotCanvas
 
-import wx.lib.inspection
-
 matplotlib.use('WXAgg')
 
 
@@ -58,5 +56,4 @@ class PlotCross(object):
         ylabel = 'Depth'
         self.frame = PlotCanvas(None, -1, "Cross Plot", plot_titles, depths, y_ndarr, xlabel, ylabel)
         self.frame.Show(True)
-        wx.lib.inspection.InspectionTool().Show()
         self.app.MainLoop()

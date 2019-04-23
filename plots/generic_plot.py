@@ -9,8 +9,6 @@ from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
 from matplotlib.backends.backend_wxagg import NavigationToolbar2WxAgg as NavigationToolbar
 from matplotlib.figure import Figure
 
-import wx.lib.inspection
-
 matplotlib.use('WXAgg')
 
 
@@ -19,7 +17,6 @@ class GenericPlot(object):
         self.app = wx.App()
         self.frame = PlotCanvas(None, -1, frame_title,  plot_titles, x_ndarr, y_ndarr, x_labels, y_labels)
         self.frame.Show(True)
-        wx.lib.inspection.InspectionTool().Show()
         self.app.MainLoop()
 
 

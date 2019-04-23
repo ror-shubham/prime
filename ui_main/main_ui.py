@@ -58,6 +58,7 @@ class MainFrame(wx.Frame):
         self.box_left = wx.BoxSizer(wx.VERTICAL)
         panel_left.SetSizer(self.box_left)
         self.staticText1 = wx.StaticText(self, label="Projects:")
+        self.box_left.Add(self.staticText1, 0)
 
         self.left_tree = CT.CustomTreeCtrl(self, agwStyle = CT.TR_AUTO_CHECK_CHILD | CT.TR_AUTO_CHECK_PARENT)
         self.box_left.Add(self.left_tree, 1, wx.EXPAND, border=5)
@@ -66,10 +67,11 @@ class MainFrame(wx.Frame):
         self.left_tree.ExpandAll()
 
         self.box_main.Add(panel_left, 1, wx.EXPAND)
-        self.panel_right = wx.Panel(self)
 
         self.box_right = wx.BoxSizer(wx.VERTICAL)
-        panel_left.SetSizer(self.box_right)
+        self.panel_right = wx.Panel(self)
+        self.panel_right.SetBackgroundColour(wx.Colour(0,0,0))
+        self.panel_right.SetSizer(self.box_right)
         self.box_main.Add(self.panel_right, 4, wx.EXPAND)
 
         self.SetSizer(self.box_main)
