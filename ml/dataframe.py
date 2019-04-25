@@ -5,7 +5,7 @@ class merge_dataset():
     def __init__(self,hl):
         self.hl = hl
 
-    def merge(self,  columns_to_join = ['RHOB']):
+    def merge(self,  columns_to_join):
 
         for i in range(len(self.hl)):
             self.hl[i] = self.hl[i][['DEPTH', 'lat', 'long'] + columns_to_join].dropna()

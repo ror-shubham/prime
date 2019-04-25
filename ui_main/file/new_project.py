@@ -5,6 +5,8 @@ import wx.lib.filebrowsebutton as filebrowse
 import os
 import pathlib
 
+from utils.commons import show_message_dialog
+
 
 # TODO form validation for filename
 class NewProjectDialog(wx.Dialog):
@@ -18,7 +20,7 @@ class NewProjectDialog(wx.Dialog):
         box_main = wx.BoxSizer(wx.VERTICAL)
         box_name = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.static_name = wx.StaticText(self, wx.ID_ANY, u"Project Name: ", size = wx.DefaultSize)
+        self.static_name = wx.StaticText(self, wx.ID_ANY, u"Project Name: ", size=wx.DefaultSize)
         box_name.Add(self.static_name, 0, wx.ALIGN_LEFT | wx.ALL, 5)
         self.project_text = wx.TextCtrl(self)
         box_name.Add(self.project_text, 1, wx.ALIGN_LEFT | wx.ALL, 5)
@@ -29,7 +31,7 @@ class NewProjectDialog(wx.Dialog):
             size=(450, -1),
             changeCallback=self.dbbCallback,
             labelText="Project Home",
-            startDirectory = self.home_dir,
+            startDirectory=self.home_dir,
             name='dirBrowseButton'
         )
         self.dbb.textControl.SetValue(self.home_dir)
@@ -60,14 +62,10 @@ class NewProjectDialog(wx.Dialog):
         project_path = os.path.join(self.home_dir, self.project_text.GetValue() + '.prime')
         project_exists = os.path.isfile(project_path)
         if project_exists:
-            dlg = wx.MessageDialog(self,
-                                   'The project already exists at the given path. Please rename or open the existing '
-                                   'project',
-                                   'Error',
-                                   wx.OK | wx.ICON_INFORMATION
-                                   )
-            dlg.ShowModal()
-            dlg.Destroy()
+            show_message_dialog(self,
+                                'The project already exists at the given path. Please rename or open the existing '
+                                'project',
+                                'Error', )
         else:
             pathlib.Path(project_path).touch()
             self.project_path = project_path

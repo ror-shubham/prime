@@ -43,11 +43,11 @@ class PredictionDialog(wx.Dialog):
                                             wx.DefaultSize, 0)
         self.static_methods.Wrap(-1)
         methods_choices = ["linear", "svm"]
-        self.choice = wx.Choice(self, choices=methods_choices)
-        self.choice.SetSelection(0)
+        self.choice_method = wx.Choice(self, choices=methods_choices)
+        self.choice_method.SetSelection(0)
 
         sizer_method.Add(self.static_methods, 0, wx.ALL, 5)
-        sizer_method.Add(self.choice, 1, wx.ALL, 5)
+        sizer_method.Add(self.choice_method, 1, wx.ALL, 5)
 
         sizer_main.Add(sizer_method, 1, wx.EXPAND, 5)
 
@@ -65,5 +65,11 @@ class PredictionDialog(wx.Dialog):
 
         self.Centre(wx.BOTH)
 
-    def __del__(self):
-        pass
+    def get_num_wells(self):
+        return self.text_ctrl_num_wells.GetValue()
+
+    def get_selected_property(self):
+        return self.choice_props.GetStringSelection()
+
+    def get_selected_method(self):
+        return self.choice_method.GetStringSelection()

@@ -39,11 +39,13 @@ class InitialDialog(wx.Dialog):
             return
         else:
             self.project_path = dlg.get_project_path()
-            self.Destroy()
+            self.EndModal(wx.ID_OK)
+            # TODO file name validator here
 
     def on_open_click(self, event):
         self.project_path = open_project_dlg(self)
-        self.Destroy()
+        if(self.project_path is not None):
+            self.EndModal(wx.ID_OK)
 
     def get_project_path(self):
         return self.project_path

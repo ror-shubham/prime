@@ -46,14 +46,14 @@ class SelectCrossPlotField(wx.Dialog):
         return self.choice_box.GetStringSelection()
 
 
-class PlotCross(object):
-    def __init__(self, df_arr, df_field):
-        self.app = wx.App()
+class PlotCross():
+    def __init__(self, parent, plotter, df_arr, df_field):
         depths = list(map(lambda df: df.index.to_numpy(), df_arr))
         y_ndarr = list(map(lambda df: df[df_field].to_numpy(), df_arr))
-        plot_titles = list(map(lambda x: "a", df_arr))
+        # todo add real title here
+        plot_titles = list(map(lambda x: df_field + " vs Depth", df_arr))
         xlabel = df_field
         ylabel = 'Depth'
-        self.frame = PlotCanvas(None, -1, "Cross Plot", plot_titles, depths, y_ndarr, xlabel, ylabel)
-        self.frame.Show(True)
-        self.app.MainLoop()
+        pnl = PlotCanvas(parent, plot_titles, depths, y_ndarr, xlabel, ylabel)
+        plotter.nb.AddPage(pnl, "Cross plot " + df_field)
+        parent.Layout()

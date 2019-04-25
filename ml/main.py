@@ -10,12 +10,12 @@ def depth_to_column (df_wells_list_0):
     return df_wells_list_0
 
 
-def validation(df_wells_list_0, property_,algorithm,scoring):
+def validation(df_wells_list_0, property_, algorithm, scoring):
     df_wells_list = depth_to_column(df_wells_list_0)
     m = merge_dataset(df_wells_list)
     train_df = m.merge([property_])
     model = interpolation(train_df)
-    scores = model.validation(algorithm,property_,scoring)
+    scores = model.validation(algorithm, property_, scoring)
     return scores
 
 

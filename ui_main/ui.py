@@ -72,7 +72,7 @@ class MainFrame(wx.Frame):
         self.panel_right = wx.Panel(self)
         self.panel_right.SetBackgroundColour(wx.Colour(0,0,0))
         self.panel_right.SetSizer(self.box_right)
-        self.box_main.Add(self.panel_right, 4, wx.EXPAND)
+        self.box_main.Add(self.panel_right, 6, wx.EXPAND)
 
         self.SetSizer(self.box_main)
         self.Centre(wx.BOTH)
@@ -88,9 +88,6 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_prediction, id=self.prediction_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_validation, id=self.validation_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_3d_plot, id=self.plot_3d_menu.GetId())
-
-    def __del__(self):
-        pass
 
     # Virtual event handlers, override them in your derived class
     def new_project(self, event):

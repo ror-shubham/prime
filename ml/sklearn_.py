@@ -14,32 +14,36 @@ class interpolation():
 
 
     def validation(self, algorithm = RandomForestRegressor,property_ = 'RHOB',scoring='r2',kwds ={},cv=3):
-        try:
-            if (algorithm == 'pykrige'):
-                algorithm = BaggingRegressor
-            clf = algorithm(**kwds)
-            scores = cross_val_score(clf, self.train_df[['DEPTH', 'lat', 'long']], self.train_df[property_], cv=cv,
-                                     scoring=scoring)
-            print("Scoring ("+ scoring+") : %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
-            # TODO return scores
-            return scores
-        except:
-            print(str(str(algorithm).split("'")[-2].split('.')[-1]) + ' is not valid for this kind of data, try something different algorithms')
+        # try:
+        if (algorithm == 'pykrige'):
+            algorithm = BaggingRegressor
+        clf = algorithm(**kwds)
+        scores = cross_val_score(clf, self.train_df[['DEPTH', 'lat', 'long']], self.train_df[property_], cv=cv,
+                                 scoring=scoring)
+        print("Scoring ("+ scoring+") : %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+        # TODO return something more sensible
+        return "Scoring ("+ scoring+") : %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2)
+        # except:
+        #     print(str(str(algorithm).split("'")[-2].split('.')[-1]) + ' is not valid for this kind of data, try something different algorithms')
 
 
 
     def prediciton(self,test_df,property_ = 'RHOB',algorithm=RandomForestRegressor,kwds={}):
-        try:
-            if(algorithm=='pykrige'):
-                algorithm = BaggingRegressor
+        algorithm=RandomForestRegressor
+        # try:
+        if(algorithm=='pykrige'):
+            algorithm = BaggingRegressor
 
-            clf = algorithm(**kwds)
-            clf.fit(self.train_df[['DEPTH', 'lat', 'long']], self.train_df[property_])
-            pred = clf.predict(test_df)
-            test_df['RHOB'] = pred
-            return test_df
-        except:
-            print(str(str(algorithm).split("'")[-2].split('.')[-1]) + ' is not valid for this kind of data, try something different algorithms')
+        clf = algorithm(**kwds)
+        clf.fit(self.train_df[['DEPTH', 'lat', 'long']], self.train_df[property_])
+        print('train done')
+        pred = clf.predict(test_df)
+        print('prediction done')
+        test_df[property_] = pred
+        return test_df
+        #except:
+         #   print(str(str(algorithm).split("'")[-2].split('.')[-1]) + ' is not valid for this kind of data, try something different algorithms')
+
 
 
 
