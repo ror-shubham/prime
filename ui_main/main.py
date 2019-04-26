@@ -64,25 +64,18 @@ class Frame(ui.MainFrame):
     def load_las_logic(self, path, well_name):
         lasObj = ReadLas(path)
         lasObj.df = lasObj.df.replace(-999.2500, np.nan)
-        # self.df = lasObj.df.replace(-999.2500, np.nan)
-        # TODO handle nan values implicitly
-        # self.df = self.df.replace(-999.2500, np.nan)
+        # TODO handle nan values implicitly, here it's hard coded
         if well_name in self.wells:
             self.wells[well_name].append(lasObj)
             child_tree = self.well_to_tree[well_name]
-            beg = lasObj.get_begin_depth()
-            end = lasObj.get_end_depth()
-            self.add_las_to_well(child_tree, str(beg) + " - " + str(end))
-            self.left_tree.ExpandAll()
-
         else:
             self.wells[well_name] = [lasObj]
             child_tree = self.add_well(self.root, well_name)
             self.well_to_tree[well_name] = child_tree
-            beg = lasObj.get_begin_depth()
-            end = lasObj.get_end_depth()
-            self.add_las_to_well(child_tree, str(beg) + " - " + str(end))
-            self.left_tree.ExpandAll()
+        beg = lasObj.get_begin_depth()
+        end = lasObj.get_end_depth()
+        self.add_las_to_well(child_tree, str(beg) + " - " + str(end))
+        self.left_tree.ExpandAll()
         self.log_plot_menu.Enable(True)
 
     def plot_log(self, event):
