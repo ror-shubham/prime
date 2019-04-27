@@ -35,8 +35,8 @@ class MainFrame(wx.Frame):
 
         self.log_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Log Plot")
         self.plot_menu.Append(self.log_plot_menu)
-        self.cross_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Cross Plot")
-        self.plot_menu.Append(self.cross_plot_menu)
+        self.correaltion_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Correlation Plot")
+        self.plot_menu.Append(self.correaltion_plot_menu)
         self.tools_menu.AppendSubMenu(self.plot_menu, u"Plot")
 
         self.interpolation_menu = wx.Menu()
@@ -84,7 +84,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.open_project, id=self.open_project_menu.GetId())
         self.Bind(wx.EVT_MENU, self.load_las_dlg, id=self.load_menu.GetId())
         self.Bind(wx.EVT_MENU, self.plot_log, id=self.log_plot_menu.GetId())
-        self.Bind(wx.EVT_MENU, self.cross_plot, id=self.cross_plot_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.correlation_plot, id=self.correaltion_plot_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_prediction, id=self.prediction_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_validation, id=self.validation_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_3d_plot, id=self.plot_3d_menu.GetId())
@@ -105,7 +105,7 @@ class MainFrame(wx.Frame):
     def plot_log(self, event):
         event.Skip()
 
-    def cross_plot(self, event):
+    def correlation_plot(self, event):
         event.Skip()
 
     def add_well(self, tree, name):

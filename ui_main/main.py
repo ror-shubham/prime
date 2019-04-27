@@ -5,7 +5,7 @@ from utils.readLas import ReadLas
 from plots.log_plot import PlotLog
 import numpy as np
 import wx.lib.inspection
-from plots.cross_plot import SelectCrossPlotField, PlotCross
+from plots.correlation_plot import SelectCorrelationPlotField, PlotCorrelation
 from plots.plot_3d import plot_3d
 from ml import main
 from sklearn.ensemble import RandomForestRegressor
@@ -91,25 +91,25 @@ class Frame(ui.MainFrame):
             show_message_dialog(self, 'Only one well should be selected for Log Plot',
                                 'Error', )
 
-    def cross_plot(self, event):
+    def correlation_plot(self, event):
 
         # TODO assumption here: only one LAS selected per well
 
         df_arr = self.get_selected_df_list()
         if (len(df_arr) < 2):
             show_message_dialog(self,
-                                'At least two wells needs to be selected for Cross Plot',
+                                'At least two wells needs to be selected for Correlation Plot',
                                 'Error',)
         else:
             common_fields = self._get_common_fields()
-            dlg = SelectCrossPlotField(self, common_fields)
+            dlg = SelectCorrelationPlotField(self, common_fields)
             dlg.SetSize(250, -1)
             dlg.CenterOnScreen()
             val = dlg.ShowModal()
             if val != wx.ID_OK:
                 return
             choice_field = dlg.get_selection()
-            PlotCross(self.panel_right, self.plotter, df_arr, choice_field)
+            PlotCorrelation(self.panel_right, self.plotter, df_arr, choice_field)
 
     def _get_common_fields(self):
         col_arr = []

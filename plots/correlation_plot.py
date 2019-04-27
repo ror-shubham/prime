@@ -6,9 +6,9 @@ import plotly.graph_objs as go
 from plotly.offline import plot
 
 
-class SelectCrossPlotField(wx.Dialog):
+class SelectCorrelationPlotField(wx.Dialog):
     def __init__(self, parent, choices):
-        wx.Dialog.__init__(self, parent, title="Select Field to cross plot")
+        wx.Dialog.__init__(self, parent, title="Select Field to correlation plot")
 
         box_main = wx.BoxSizer(wx.VERTICAL)
         box_well_id = wx.BoxSizer(wx.VERTICAL)
@@ -43,7 +43,7 @@ class SelectCrossPlotField(wx.Dialog):
         return self.choice_box.GetStringSelection()
 
 
-class PlotCross():
+class PlotCorrelation():
     def __init__(self, parent, plotter, df_arr, df_field):
         depths = list(map(lambda df: df.index.to_numpy(), df_arr))
         y_ndarr = list(map(lambda df: df[df_field].to_numpy(), df_arr))
@@ -81,4 +81,4 @@ class PlotCross():
         browser = wx.html2.WebView.New(parent)
         browser.SetPage(html_string, "")
 
-        plotter.nb.AddPage(browser, "Cross plot " + df_field)
+        plotter.nb.AddPage(browser, "Correlation plot " + df_field)
