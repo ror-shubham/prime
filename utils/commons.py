@@ -1,5 +1,6 @@
 import wx
 
+
 def show_message_dialog(parent, message, title):
     dlg = wx.MessageDialog(parent,
                            message,

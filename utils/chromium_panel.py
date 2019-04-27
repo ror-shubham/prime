@@ -59,7 +59,3 @@ class FocusHandler(object):
                   " keyboard focus fix (Issue #284)")
             browser.SetFocus(True)
 
-
-def on_timer(_):
-    cef.MessageLoopWork()
-

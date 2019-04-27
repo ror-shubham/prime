@@ -2,11 +2,13 @@ import pickle
 
 import wx
 from utils.readLas import ReadLas
-from plots.log_plot import PlotLog
 import numpy as np
 import wx.lib.inspection
+from plots.log_plot import PlotLog
 from plots.correlation_plot import SelectCorrelationPlotField, PlotCorrelation
 from plots.plot_3d import plot_3d
+from plots.overlay_plot import SetOverlayProperties, PlotOverlaySet
+
 from ml import main
 from sklearn.ensemble import RandomForestRegressor
 
@@ -111,6 +113,23 @@ class Frame(ui.MainFrame):
             choice_field = dlg.get_selection()
             PlotCorrelation(self.panel_right, self.plotter, df_arr, choice_field)
 
+    def overlay_plot(self, event):
+        df_arr = self.get_selected_df_list()
+        num_selected = len(df_arr)
+        if num_selected == 1:
+            df = df_arr[0]
+            choices = df.columns[:-2]
+            dlg = SetOverlayProperties(self, choices)
+            dlg.CenterOnScreen()
+            val = dlg.ShowModal()
+            if val != wx.ID_OK:
+                return
+            props_to_relate = dlg.get_selection()
+            PlotOverlaySet(self.panel_right, self.plotter, df, props_to_relate)
+        else:
+            show_message_dialog(self, 'Only one well should be selected for Overlay Plot',
+                                'Error', )
+
     def _get_common_fields(self):
         col_arr = []
         selected_list = self.get_selected_df_list()
@@ -120,11 +139,9 @@ class Frame(ui.MainFrame):
         for col in col_arr:
             common_fields = common_fields.intersection(col)
         common_list = common_fields.tolist()
-        common_list.remove('lat')
-        common_list.remove('long')
         return common_list
 
-    def get_selected_df_list(self):
+    def get_selected_df_list(self, with_lat_long=False):
         self.selected_df_list = []
         self.selected_dict = {}
         for well_name in self.well_to_tree:
@@ -132,7 +149,11 @@ class Frame(ui.MainFrame):
             children = tree.GetChildren()
             for index, child in enumerate(children):
                 if child.IsChecked():
-                    self.selected_df_list.append(self.wells[well_name][index].df)
+                    if with_lat_long:
+                        to_append = self.wells[well_name][index].df
+                    else:
+                        to_append = self.wells[well_name][index].df.drop(columns =['lat', 'long'])
+                    self.selected_df_list.append(to_append)
                     if well_name in self.selected_dict:
                         if index not in self.selected_dict[well_name]:
                             self.selected_dict[well_name].append(index)
@@ -149,7 +170,7 @@ class Frame(ui.MainFrame):
         selected_prop = dlg.get_selected_property()
         selected_method = dlg.get_selected_method()
         num_wells = int(dlg.get_num_wells())
-        selected_df_list = self.get_selected_df_list()
+        selected_df_list = self.get_selected_df_list(with_lat_long=True)
         self.predicted_df = main.prediction(selected_df_list, selected_prop, num_wells, RandomForestRegressor)
 
         # TODO run prediction here
@@ -163,7 +184,7 @@ class Frame(ui.MainFrame):
         selected_prop = dlg.get_selected_property()
         selected_method = dlg.get_selected_method()
         selected_scoring = dlg.get_selected_scoring()
-        selected_df_list = self.get_selected_df_list()
+        selected_df_list = self.get_selected_df_list(with_lat_long=True)
         scores = main.validation(selected_df_list, selected_prop, RandomForestRegressor, selected_scoring)
         show_message_dialog(self, scores, 'Scores')
 
