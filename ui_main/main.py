@@ -22,6 +22,9 @@ from ui_main.plot_notebook import PlotNotebook
 
 from utils.commons import show_message_dialog
 
+from cefpython3 import cefpython as cef
+
+
 
 class Frame(ui.MainFrame):
     def __init__(self, parent, project_path):
@@ -189,6 +192,10 @@ class Frame(ui.MainFrame):
             show_message_dialog(self, 'Please run prediction first. Currently, 3d '
                                       'plot runs only in conjecture of prediction', 'Error')
 
+def on_timer(_):
+    cef.MessageLoopWork()
+
+
 
 if __name__ == "__main__":
     app = wx.App(False)
@@ -197,6 +204,9 @@ if __name__ == "__main__":
     if val == wx.ID_OK:
         project_path = dlg.get_project_path()
         frame = Frame(None, project_path)
+        timer = wx.Timer(frame, 1)
+        frame.Bind(wx.EVT_TIMER, on_timer, timer)
+        timer.Start(10)  # 10ms timer
         frame.Show(True)
         wx.lib.inspection.InspectionTool().Show()
         app.MainLoop()

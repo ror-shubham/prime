@@ -1,39 +1,61 @@
-import matplotlib as mpl
-from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg as FigureCanvas
-from mpl_toolkits.mplot3d import Axes3D
+import os
+import pwd
 
-import wx
-
-
-class Plot(wx.Panel):
-    def __init__(self, parent, id=-1, dpi=None, **kwargs):
-        wx.Panel.__init__(self, parent, id=id, **kwargs)
-        self.figure = mpl.figure.Figure()
-        self.canvas = FigureCanvas(parent, -1, self.figure)
-        # self.toolbar = NavigationToolbar(self.canvas)
-        # self.toolbar.Realize()
-
-        sizer = wx.BoxSizer(wx.VERTICAL)
-        sizer.Add(self.canvas, 1, wx.EXPAND)
-        # sizer.Add(self.toolbar, 0, wx.LEFT | wx.EXPAND)
-        self.SetSizer(sizer)
+from utils.chromium_panel import MainPanel
+from plotly.offline import plot
+import plotly.graph_objs as go
 
 
 def plot_3d(plotter, data):
-    fig = plotter.add_3d('3d cross plot')
-    axes = fig.gca(projection='3d')
     data = data.sample(frac=0.01)
-    # TODO make the sample taking dynamic based on data size
+    # # TODO make the sample taking dynamic based on data size
     x = data.lat
     y = data.long
-    z = data.DEPTH
+    z = -1 * data.DEPTH
     prop_ind = data.columns[3]
     w = data[prop_ind]
-    plt = axes.scatter(x, y, z, c=w, s=30)
-    axes.set_xlabel('Latitude')
-    axes.set_ylabel('Longitude')
-    axes.set_zlabel('Depth')
-    cbar = fig.colorbar(plt)
-    cbar.set_label(prop_ind)
+    trace3d = go.Scatter3d(
+        x=x,
+        y=y,
+        z=z,
+        mode='markers',
+        marker=dict(
+            color=w,
+            colorscale='Viridis',
+            colorbar=dict(
+                thickness=20,
+                title=prop_ind,
+            ),
+            opacity=0.9
+        ),
+        text=w,
+        hoverinfo = "x+y+z+text"
+    )
+    data = [trace3d]
+    layout = go.Layout(
+        title=prop_ind+" 3d plot",
+        scene=dict(
+            xaxis=dict(
+                title='Latitude'),
+            yaxis=dict(
+                title='Longitude'),
+            zaxis=dict(
+                title='Depth'), ),
+        autosize=True,
+        margin=dict(
+            l=65,
+            r=50,
+            b=65,
+            t=90
+        )
+    )
+    fig = go.Figure(data=data, layout=layout)
+    home_dir = pwd.getpwuid(os.getuid()).pw_dir
+    prime_dir = pwd.getpwuid(os.getuid()).pw_dir + '/PrimeProjects'
+    html_dir = prime_dir if os.path.exists(prime_dir) else home_dir
+    html_file_path = plot(fig, filename=html_dir+'/temp.html', auto_open=False)
+
+    pnl = MainPanel(plotter.nb, html_file_path)
+    plotter.nb.AddPage(pnl, "3d plot")
 
 
