@@ -1,13 +1,10 @@
-import wx
-import wx.html2
-
 from plotly import tools
 import plotly.graph_objs as go
 from plotly.offline import plot
 
 
 class PlotLog(object):
-    def __init__(self, parent, plotter, data):
+    def __init__(self, data):
         plot_titles = list(map(lambda x: "Depth vs " + x, data.columns))
         x_ndarr = data.index.to_numpy()
         y_ndarr = list(map(lambda x: data[x].to_numpy(), data.columns))
@@ -36,10 +33,7 @@ class PlotLog(object):
         fig['layout']['yaxis'].update(title='Depth', autorange='reversed')
         for i in range(1, num_columns):
             fig['layout']['xaxis' + str(i)].update(title=data.columns[i], showspikes= True)
-        html_string = plot(fig, output_type='div')
+        self.html_string = plot(fig, output_type='div')
 
-        browser = wx.html2.WebView.New(parent)
-        browser.SetPage(html_string, "")
-
-        plotter.nb.AddPage(browser, "Log plot")
-        parent.Layout()
+    def get_html_string(self):
+        return self.html_string

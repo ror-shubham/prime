@@ -21,7 +21,7 @@ if MAC:
         sys.exit(1)
 
 
-class MainPanel(wx.Panel):
+class ChromiumPanel(wx.Panel):
     def __init__(self, parent, html_file_path):
         self.html_file_path = html_file_path
         wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY,

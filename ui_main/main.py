@@ -1,13 +1,19 @@
 import pickle
+from cefpython3 import cefpython as cef
 
 import wx
-from utils.readLas import ReadLas
+import wx.html2
 import numpy as np
 import wx.lib.inspection
+
+from utils.readLas import ReadLas
+from utils.commons import show_message_dialog, add_html_to_browser_page
+
 from plots.log_plot import PlotLog
 from plots.correlation_plot import SelectCorrelationPlotField, PlotCorrelation
 from plots.plot_3d import plot_3d
 from plots.overlay_plot import SetOverlayProperties, PlotOverlaySet
+from plots.cross_plot import PlotCross, SetCrossPlotProperties
 
 from ml import main
 from sklearn.ensemble import RandomForestRegressor
@@ -22,9 +28,8 @@ from ui_main.initial_dialog import InitialDialog
 from ui_main.file.save_project import save_project_to_file
 from ui_main.plot_notebook import PlotNotebook
 
-from utils.commons import show_message_dialog
+from analysis.vshale import gr_analysis
 
-from cefpython3 import cefpython as cef
 
 
 
@@ -81,14 +86,15 @@ class Frame(ui.MainFrame):
         end = lasObj.get_end_depth()
         self.add_las_to_well(child_tree, str(beg) + " - " + str(end))
         self.left_tree.ExpandAll()
-        self.log_plot_menu.Enable(True)
 
     def plot_log(self, event):
         selected = self.get_selected_df_list()
         num_selected = len(selected)
         if num_selected == 1:
             df = selected[0]
-            PlotLog(self.panel_right, self.plotter, df)
+            plt_log_obj = PlotLog(df)
+            html_string = plt_log_obj.get_html_string()
+            add_html_to_browser_page(self.panel_right, self.plotter, html_string, "Log Plot")
         else:
             show_message_dialog(self, 'Only one well should be selected for Log Plot',
                                 'Error', )
@@ -111,7 +117,9 @@ class Frame(ui.MainFrame):
             if val != wx.ID_OK:
                 return
             choice_field = dlg.get_selection()
-            PlotCorrelation(self.panel_right, self.plotter, df_arr, choice_field)
+            plot_obj = PlotCorrelation(self.panel_right, self.plotter, df_arr, choice_field)
+            html_string = plot_obj.get_html_string()
+            add_html_to_browser_page(self.panel_right, self.plotter, html_string, "Correlation plot")
 
     def overlay_plot(self, event):
         df_arr = self.get_selected_df_list()
@@ -125,10 +133,31 @@ class Frame(ui.MainFrame):
             if val != wx.ID_OK:
                 return
             props_to_relate = dlg.get_selection()
-            PlotOverlaySet(self.panel_right, self.plotter, df, props_to_relate)
+            plot_obj = PlotOverlaySet(self.panel_right, self.plotter, df, props_to_relate)
+            html_string = plot_obj.get_html_string()
+            add_html_to_browser_page(self.panel_right, self.plotter, html_string, "Overlay plot")
         else:
             show_message_dialog(self, 'Only one well should be selected for Overlay Plot',
                                 'Error', )
+
+    def cross_plot(self, event):
+        df_arr = self.get_selected_df_list()
+        num_selected = len(df_arr)
+        if num_selected == 1:
+            df = df_arr[0]
+            choices = df.columns[:-2]
+            dlg = SetCrossPlotProperties(self, choices)
+            dlg.CenterOnScreen()
+            val = dlg.ShowModal()
+            if val != wx.ID_OK:
+                return
+            props_to_relate = dlg.get_selection()
+            plot_cross = PlotCross(df, props_to_relate)
+            html_string = plot_cross.get_html_string()
+            add_html_to_browser_page(self.panel_right, self.plotter, html_string, "Cross Plot")
+        else:
+            show_message_dialog(self, 'Only one well should be selected for Overlay Plot', 'Error')
+
 
     def _get_common_fields(self):
         col_arr = []
@@ -212,6 +241,10 @@ class Frame(ui.MainFrame):
         except AttributeError:
             show_message_dialog(self, 'Please run prediction first. Currently, 3d '
                                       'plot runs only in conjecture of prediction', 'Error')
+
+
+
+
 
 def on_timer(_):
     cef.MessageLoopWork()

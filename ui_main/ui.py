@@ -39,6 +39,8 @@ class MainFrame(wx.Frame):
         self.plot_menu.Append(self.correlation_plot_menu)
         self.overlay_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Overlay Plot")
         self.plot_menu.Append(self.overlay_plot_menu)
+        self.cross_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Cross Plot")
+        self.plot_menu.Append(self.cross_plot_menu)
         self.tools_menu.AppendSubMenu(self.plot_menu, u"Plot")
 
         self.interpolation_menu = wx.Menu()
@@ -50,6 +52,13 @@ class MainFrame(wx.Frame):
         self.interpolation_menu.Append(self.plot_3d_menu)
         self.tools_menu.AppendSubMenu(self.interpolation_menu, u"Interpolate")
         self.menubar.Append(self.tools_menu, u"Tools")
+
+        self.analysis_menu = wx.Menu()
+        self.vshale_menu = wx.Menu()
+        self.gr_vshale_menu = wx.MenuItem(self.vshale_menu, wx.ID_ANY, u"GR")
+        self.vshale_menu.Append(self.gr_vshale_menu)
+        self.analysis_menu.AppendSubMenu(self.vshale_menu, u"Plot")
+        self.menubar.Append(self.analysis_menu, u"Analysis")
 
         self.SetMenuBar(self.menubar)
 
@@ -84,13 +93,19 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.new_project, id=self.new_project_menu.GetId())
         self.Bind(wx.EVT_MENU, self.save_project, id=self.save_project_menu.GetId())
         self.Bind(wx.EVT_MENU, self.open_project, id=self.open_project_menu.GetId())
+
         self.Bind(wx.EVT_MENU, self.load_las_dlg, id=self.load_menu.GetId())
+
         self.Bind(wx.EVT_MENU, self.plot_log, id=self.log_plot_menu.GetId())
         self.Bind(wx.EVT_MENU, self.correlation_plot, id=self.correlation_plot_menu.GetId())
         self.Bind(wx.EVT_MENU, self.overlay_plot, id=self.overlay_plot_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.cross_plot, id=self.cross_plot_menu.GetId())
+
         self.Bind(wx.EVT_MENU, self.on_prediction, id=self.prediction_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_validation, id=self.validation_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_3d_plot, id=self.plot_3d_menu.GetId())
+
+        self.Bind(wx.EVT_MENU, self.on_gr_vshale, id=self.gr_vshale_menu.GetId())
 
     # Virtual event handlers, override them in your derived class
     def new_project(self, event):
@@ -114,6 +129,9 @@ class MainFrame(wx.Frame):
     def overlay_plot(self, event):
         event.Skip()
 
+    def cross_plot(self, event):
+        event.Skip()
+
     def add_well(self, tree, name):
         return self.left_tree.AppendItem(self.root, name, ct_type=1)
 
@@ -127,4 +145,7 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def on_3d_plot(self, event):
+        event.Skip()
+
+    def on_gr_vshale(self, event):
         event.Skip()

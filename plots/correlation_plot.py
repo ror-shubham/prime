@@ -76,9 +76,7 @@ class PlotCorrelation():
             fig['layout']['yaxis'].update(title='Depth', autorange='reversed')
             fig['layout']['xaxis' + str(i)].update(title=df_field, showspikes= True)
 
-        html_string = plot(fig, output_type='div')
+        self.html_string = plot(fig, output_type='div')
 
-        browser = wx.html2.WebView.New(parent)
-        browser.SetPage(html_string, "")
-
-        plotter.nb.AddPage(browser, "Correlation plot " + df_field)
+    def get_html_string(self):
+        return self.html_string
