@@ -88,6 +88,7 @@ class PlotOverlaySet(object):
             ),
             yaxis=dict(showspikes=True),
             autosize=True,
+            width=600,
             margin=dict(
                 l=65,
                 r=50,

@@ -20,9 +20,8 @@ class interpolation():
         clf = algorithm(**kwds)
         scores = cross_val_score(clf, self.train_df[['DEPTH', 'lat', 'long']], self.train_df[property_], cv=cv,
                                  scoring=scoring)
-        print("Scoring ("+ scoring+") : %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
         # TODO return something more sensible
-        return "Scoring ("+ scoring+") : %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2)
+        return "Scoring ("+ scoring+"). Mean : %0.2f Standard Deviation: +/- %0.2f)" % (scores.mean(), scores.std() * 2)
         # except:
         #     print(str(str(algorithm).split("'")[-2].split('.')[-1]) + ' is not valid for this kind of data, try something different algorithms')
 

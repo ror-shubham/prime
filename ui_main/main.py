@@ -158,6 +158,22 @@ class Frame(ui.MainFrame):
         else:
             show_message_dialog(self, 'Only one well should be selected for Overlay Plot', 'Error')
 
+    def on_gr_vshale(self, event):
+        df_arr = self.get_selected_df_list()
+        num_selected = len(df_arr)
+        if num_selected == 1:
+            dlg = gr_analysis.GrMinMaxSelect(self, df_arr[0])
+            modal_val = dlg.ShowModal()
+            if modal_val != wx.ID_OK:
+                return
+            gr_min_max = dlg.get_min_max()
+            plot_obj = gr_analysis.GrAnalysis(df_arr[0], gr_min_max)
+            html_string = plot_obj.get_html_string()
+            add_html_to_browser_page(self.panel_right, self.plotter, html_string, "GR Plot")
+        else:
+            show_message_dialog(self, 'Only one well should be selected for GR Plot',
+                                'Error', )
+
 
     def _get_common_fields(self):
         col_arr = []
@@ -243,12 +259,8 @@ class Frame(ui.MainFrame):
                                       'plot runs only in conjecture of prediction', 'Error')
 
 
-
-
-
 def on_timer(_):
     cef.MessageLoopWork()
-
 
 
 if __name__ == "__main__":

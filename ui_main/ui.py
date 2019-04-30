@@ -57,7 +57,7 @@ class MainFrame(wx.Frame):
         self.vshale_menu = wx.Menu()
         self.gr_vshale_menu = wx.MenuItem(self.vshale_menu, wx.ID_ANY, u"GR")
         self.vshale_menu.Append(self.gr_vshale_menu)
-        self.analysis_menu.AppendSubMenu(self.vshale_menu, u"Plot")
+        self.analysis_menu.AppendSubMenu(self.vshale_menu, u"Vshale")
         self.menubar.Append(self.analysis_menu, u"Analysis")
 
         self.SetMenuBar(self.menubar)
