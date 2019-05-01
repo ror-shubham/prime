@@ -6,6 +6,8 @@ import wx.html2
 import numpy as np
 import wx.lib.inspection
 
+import pandas as pd
+
 from utils.readLas import ReadLas
 from utils.commons import show_message_dialog, add_html_to_browser_page
 
@@ -20,8 +22,9 @@ from sklearn.ensemble import RandomForestRegressor
 
 from ui_main import ui
 from ui_main.las.load_las.well_select_dialog import SelectWellDialog
-from ui_main.tools.interpolate.prediction.prediction_dialog import PredictionDialog
-from ui_main.tools.interpolate.validation.validation_dialog import ValidationDialog
+from ui_main.tools.interpolate.petrophysics.prediction.prediction_dialog import PredictionDialog
+from ui_main.tools.interpolate.petrophysics.validation.validation_dialog import ValidationDialog
+from ui_main.tools.interpolate.facies.facies_interpolate import facies_csv_dlg
 from ui_main.file.new_project import NewProjectDialog
 from ui_main.file.open_project import open_project_dlg
 from ui_main.initial_dialog import InitialDialog
@@ -233,6 +236,17 @@ class Frame(ui.MainFrame):
         scores = main.validation(selected_df_list, selected_prop, RandomForestRegressor, selected_scoring)
         show_message_dialog(self, scores, 'Scores')
 
+    def on_interpolate_facies(self, event):
+        df_arr = self.get_selected_df_list()
+        num_selected = len(df_arr)
+        if num_selected == 1:
+            facies_path = facies_csv_dlg(self)
+            facies_df = pd.read_csv(facies_path)
+            #some_func
+        else:
+            show_message_dialog(self, 'Only one well should be selected for Facies plot',
+                                'Error', )
+
     def new_project(self, event):
         dlg = NewProjectDialog(self)
         dlg.SetSize(450, 80)
@@ -246,6 +260,7 @@ class Frame(ui.MainFrame):
 
     def open_project(self, event):
         open_project_dlg(self)
+        # TODO it does nothing right now
 
     def save_project(self, event):
         wells_modified = {k: list(map(lambda x: x.read_path, v)) for k, v in self.wells.items()}

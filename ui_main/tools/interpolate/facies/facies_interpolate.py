@@ -2,13 +2,13 @@ import os
 import wx
 
 
-def open_project_dlg(parent):
-    wildcard = "Project source (*.prime)|*.prime"
+def facies_csv_dlg(parent):
+    wildcard = "Facies CSV (*.csv)|*.csv"
     home_dir = os.path.expanduser('~')
     prime_dir = os.path.join(home_dir, 'PrimeProjects')
     dlg = wx.FileDialog(
         parent,
-        message="Create new prime project",
+        message="Select csv for facies",
         defaultFile="",
         wildcard=wildcard,
         style=wx.FD_OPEN,

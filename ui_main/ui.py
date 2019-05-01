@@ -44,13 +44,21 @@ class MainFrame(wx.Frame):
         self.tools_menu.AppendSubMenu(self.plot_menu, u"Plot")
 
         self.interpolation_menu = wx.Menu()
-        self.validation_menu = wx.MenuItem(self.interpolation_menu, wx.ID_ANY, u"Validation")
-        self.interpolation_menu.Append(self.validation_menu)
-        self.prediction_menu = wx.MenuItem(self.interpolation_menu, wx.ID_ANY, u"Prediction")
-        self.interpolation_menu.Append(self.prediction_menu)
-        self.plot_3d_menu = wx.MenuItem(self.interpolation_menu, wx.ID_ANY, u"3d Plot")
-        self.interpolation_menu.Append(self.plot_3d_menu)
+        self.petrophysics_menu = wx.Menu()
+        self.interpolation_menu.AppendSubMenu(self.petrophysics_menu, u"Petrophysics")
+        self.validation_menu = wx.MenuItem(self.petrophysics_menu, wx.ID_ANY, u"Validation")
+        self.petrophysics_menu.Append(self.validation_menu)
+        self.prediction_menu = wx.MenuItem(self.petrophysics_menu, wx.ID_ANY, u"Prediction")
+        self.petrophysics_menu.Append(self.prediction_menu)
+        self.plot_3d_menu = wx.MenuItem(self.petrophysics_menu, wx.ID_ANY, u"3d Plot")
+        self.petrophysics_menu.Append(self.plot_3d_menu)
         self.tools_menu.AppendSubMenu(self.interpolation_menu, u"Interpolate")
+
+        self.facies_menu = wx.Menu()
+        self.interpolation_menu.AppendSubMenu(self.facies_menu, u"Facies")
+        self.interpolate_facies = wx.MenuItem(self.facies_menu, wx.ID_ANY, u"Interpolate")
+        self.facies_menu.Append(self.interpolate_facies)
+
         self.menubar.Append(self.tools_menu, u"Tools")
 
         self.analysis_menu = wx.Menu()
@@ -104,6 +112,7 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.on_prediction, id=self.prediction_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_validation, id=self.validation_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_3d_plot, id=self.plot_3d_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.on_interpolate_facies, id=self.interpolate_facies.GetId())
 
         self.Bind(wx.EVT_MENU, self.on_gr_vshale, id=self.gr_vshale_menu.GetId())
 
@@ -145,6 +154,9 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def on_3d_plot(self, event):
+        event.Skip()
+
+    def on_interpolate_facies(self, event):
         event.Skip()
 
     def on_gr_vshale(self, event):
