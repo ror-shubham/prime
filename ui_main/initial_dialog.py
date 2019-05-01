@@ -1,7 +1,6 @@
 import wx
 from ui_main.file.open_project import open_project_dlg
 from ui_main.file.new_project import NewProjectDialog
-# TODO don't open anything if initia_dialog doesn't return
 
 
 class InitialDialog(wx.Dialog):
@@ -32,7 +31,6 @@ class InitialDialog(wx.Dialog):
 
     def on_new_click(self, event):
         dlg = NewProjectDialog(self)
-        dlg.SetSize(450, 80)
         dlg.CenterOnScreen()
         val = dlg.ShowModal()
         if val != wx.ID_OK:

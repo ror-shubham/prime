@@ -1,5 +1,4 @@
 import os
-import pwd
 
 from utils.chromium_panel import ChromiumPanel
 from plotly.offline import plot
@@ -50,10 +49,10 @@ def plot_3d(plotter, data):
         )
     )
     fig = go.Figure(data=data, layout=layout)
-    home_dir = pwd.getpwuid(os.getuid()).pw_dir
-    prime_dir = pwd.getpwuid(os.getuid()).pw_dir + '/PrimeProjects'
+    home_dir = os.path.expanduser('~')
+    prime_dir = os.path.join(home_dir, 'PrimeProjects')
     html_dir = prime_dir if os.path.exists(prime_dir) else home_dir
-    html_file_path = plot(fig, filename=html_dir+'/temp.html', auto_open=False)
+    html_file_path = plot(fig, filename=os.path.join(html_dir,'temp.html'), auto_open=False)
 
     pnl = ChromiumPanel(plotter.nb, html_file_path)
     plotter.nb.AddPage(pnl, "3d plot")

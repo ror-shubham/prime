@@ -1,5 +1,3 @@
-import pwd
-
 import wx
 import wx.lib.filebrowsebutton as filebrowse
 import os
@@ -12,7 +10,7 @@ from utils.commons import show_message_dialog
 class NewProjectDialog(wx.Dialog):
     def __init__(self, parent):
         self.project_path = ''
-        self.home_dir = pwd.getpwuid(os.getuid()).pw_dir + '/PrimeProjects'
+        self.home_dir = os.path.join(os.path.expanduser('~'), 'PrimeProjects')
         pathlib.Path(self.home_dir).mkdir(parents=True, exist_ok=True)
 
         wx.Dialog.__init__(self, parent, title="Set Project Name")

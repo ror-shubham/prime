@@ -26,11 +26,13 @@ class ReadLas:
         try:
             convert_to_csv(self.read_path, write_path)
         except:
+            os.close(fd)
             os.unlink(write_path)
         # converting to csv, write to file, read whole file using read_csv, and delete csv file. Because reading from
         # csv is faster
         convert_to_csv(self.read_path, write_path)
         self.df = pd.read_csv(write_path, sep='\s+', names=columns)
+        os.close(fd)
         os.unlink(write_path)
         self.df.set_index(columns[0], inplace=True)
         self.df['lat'] = self.lat
