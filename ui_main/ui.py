@@ -68,10 +68,10 @@ class MainFrame(wx.Frame):
 
         self.box_left = wx.BoxSizer(wx.VERTICAL)
         panel_left.SetSizer(self.box_left)
-        self.staticText1 = wx.StaticText(self, label="Projects:")
+        self.staticText1 = wx.StaticText(panel_left, label="Projects:")
         self.box_left.Add(self.staticText1, 0)
 
-        self.left_tree = CT.CustomTreeCtrl(self, agwStyle = CT.TR_AUTO_CHECK_CHILD | CT.TR_AUTO_CHECK_PARENT)
+        self.left_tree = CT.CustomTreeCtrl(panel_left, agwStyle = CT.TR_AUTO_CHECK_CHILD | CT.TR_AUTO_CHECK_PARENT)
         self.box_left.Add(self.left_tree, 1, wx.EXPAND, border=5)
         self.root = self.left_tree.AddRoot(project_name)
 
