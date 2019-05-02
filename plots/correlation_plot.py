@@ -44,11 +44,11 @@ class SelectCorrelationPlotField(wx.Dialog):
 
 
 class PlotCorrelation():
-    def __init__(self, parent, plotter, df_arr, df_field):
+    def __init__(self, parent, plotter, df_arr, df_field, titles):
         depths = list(map(lambda df: df.index.to_numpy(), df_arr))
         y_ndarr = list(map(lambda df: df[df_field].to_numpy(), df_arr))
         # todo add real title here
-        plot_titles = list(map(lambda x: df_field + " vs Depth", df_arr))
+        plot_titles = list(map(lambda title: df_field + " vs Depth" +"("+"Wireline: "+title+")", titles))
 
         num_columns = len(depths)
         fig = tools.make_subplots(rows=1, cols=num_columns,

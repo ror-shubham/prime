@@ -93,6 +93,8 @@ class MainFrame(wx.Frame):
         self.panel_right.SetSizer(self.box_right)
         self.box_main.Add(self.panel_right, 6, wx.EXPAND)
 
+        self.statusbar = self.CreateStatusBar(1)
+
         self.SetSizer(self.box_main)
         self.Centre(wx.BOTH)
         self.Maximize()

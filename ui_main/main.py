@@ -107,6 +107,7 @@ class Frame(ui.MainFrame):
         # TODO assumption here: only one LAS selected per well
 
         df_arr = self.get_selected_df_list()
+        well_names = list(self.selected_dict.keys())
         if (len(df_arr) < 2):
             show_message_dialog(self,
                                 'At least two wells needs to be selected for Correlation Plot',
@@ -120,7 +121,7 @@ class Frame(ui.MainFrame):
             if val != wx.ID_OK:
                 return
             choice_field = dlg.get_selection()
-            plot_obj = PlotCorrelation(self.panel_right, self.plotter, df_arr, choice_field)
+            plot_obj = PlotCorrelation(self.panel_right, self.plotter, df_arr, choice_field, well_names)
             html_string = plot_obj.get_html_string()
             add_html_to_browser_page(self.panel_right, self.plotter, html_string, "Correlation plot")
 
@@ -219,9 +220,19 @@ class Frame(ui.MainFrame):
         selected_method = dlg.get_selected_method()
         num_wells = int(dlg.get_num_wells())
         selected_df_list = self.get_selected_df_list(with_lat_long=True)
-        self.predicted_df = main.prediction(selected_df_list, selected_prop, num_wells, RandomForestRegressor)
+        num_selected = len(selected_df_list)
+        if num_selected > 3:
+            try:
+                self.predicted_df = main.prediction(selected_df_list, selected_prop, num_wells, RandomForestRegressor)
+                self.statusbar.SetStatusText('Prediction completed')
+            except Exception as e:
+                show_message_dialog(self, 'Prediction failed with error: ' + repr(e),
+                                    'Error')
+                self.statusbar.SetStatusText('Prediction failed')
+        else:
+            show_message_dialog(self, 'At least three wells should be selected for prediction',
+                                'Error')
 
-        # TODO run prediction here
 
     def on_validation(self, event):
         common_fields = self._get_common_fields()
