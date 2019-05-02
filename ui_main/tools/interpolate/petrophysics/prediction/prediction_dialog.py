@@ -4,7 +4,7 @@ import wx.xrc
 
 class PredictionDialog(wx.Dialog):
 
-    def __init__(self, parent, common_fields):
+    def __init__(self, parent, common_fields, methods_choices):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition,
                            style=wx.DEFAULT_DIALOG_STYLE)
 
@@ -23,26 +23,11 @@ class PredictionDialog(wx.Dialog):
 
         sizer_main.Add(sizer_num_wells, 1, wx.EXPAND, 5)
 
-        sizer_props = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.static_props = wx.StaticText(self, wx.ID_ANY, u"Property to be interpolated", wx.DefaultPosition,
-                                          wx.DefaultSize, 0)
-        self.static_props.Wrap(-1)
-
-        sizer_props.Add(self.static_props, 0, wx.ALL, 5)
-
-        self.choice_props = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, common_fields, 0)
-        self.choice_props.SetSelection(0)
-        sizer_props.Add(self.choice_props, 0, wx.ALL, 5)
-
-        sizer_main.Add(sizer_props, 1, wx.EXPAND, 5)
-
         sizer_method = wx.BoxSizer(wx.HORIZONTAL)
 
         self.static_methods = wx.StaticText(self, wx.ID_ANY, u"Interpolation method: ", wx.DefaultPosition,
                                             wx.DefaultSize, 0)
         self.static_methods.Wrap(-1)
-        methods_choices = ["linear", "svm"]
         self.choice_method = wx.Choice(self, choices=methods_choices)
         self.choice_method.SetSelection(0)
 
@@ -67,9 +52,6 @@ class PredictionDialog(wx.Dialog):
 
     def get_num_wells(self):
         return self.text_ctrl_num_wells.GetValue()
-
-    def get_selected_property(self):
-        return self.choice_props.GetStringSelection()
 
     def get_selected_method(self):
         return self.choice_method.GetStringSelection()

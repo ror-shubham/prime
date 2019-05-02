@@ -1,10 +1,13 @@
 import wx
 import wx.xrc
 
+from plotly.offline import plot
+import plotly.graph_objs as go
+
 
 class ValidationDialog(wx.Dialog):
 
-    def __init__(self, parent, common_fields):
+    def __init__(self, parent, common_fields, method_choices):
         wx.Dialog.__init__(self, parent, id=wx.ID_ANY, title=wx.EmptyString, pos=wx.DefaultPosition,
                            size=wx.Size(942, 264),
                            style=wx.DEFAULT_DIALOG_STYLE | wx.MAXIMIZE_BOX | wx.MINIMIZE_BOX | wx.RESIZE_BORDER)
@@ -12,20 +15,6 @@ class ValidationDialog(wx.Dialog):
         self.SetSizeHints(wx.DefaultSize, wx.DefaultSize)
 
         sizer_main = wx.BoxSizer(wx.VERTICAL)
-
-        sizer_prop = wx.BoxSizer(wx.HORIZONTAL)
-
-        self.static_prop = wx.StaticText(self, wx.ID_ANY, u"Property to be interpolated", wx.DefaultPosition,
-                                         wx.DefaultSize, 0)
-        self.static_prop.Wrap(-1)
-
-        sizer_prop.Add(self.static_prop, 0, wx.ALL, 5)
-
-        self.choice_prop = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, common_fields, 0)
-        self.choice_prop.SetSelection(0)
-        sizer_prop.Add(self.choice_prop, 0, wx.ALL, 5)
-
-        sizer_main.Add(sizer_prop, 1, wx.EXPAND, 5)
 
         sizer_interpolation = wx.BoxSizer(wx.HORIZONTAL)
 
@@ -35,8 +24,7 @@ class ValidationDialog(wx.Dialog):
 
         sizer_interpolation.Add(self.static_interpolation, 0, wx.ALL, 5)
 
-        regression_choices = [u"linear", u"svm"]
-        self.choice_method = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, regression_choices, 0)
+        self.choice_method = wx.Choice(self, wx.ID_ANY, wx.DefaultPosition, wx.DefaultSize, method_choices, 0)
         self.choice_method.SetSelection(0)
         sizer_interpolation.Add(self.choice_method, 0, wx.ALL, 5)
 
@@ -70,11 +58,43 @@ class ValidationDialog(wx.Dialog):
 
         self.Centre(wx.BOTH)
 
-    def get_selected_property(self):
-        return self.choice_prop.GetStringSelection()
-
     def get_selected_method(self):
         return self.choice_method.GetStringSelection()
 
     def get_selected_scoring(self):
         return self.choice_scoring.GetStringSelection()
+
+
+class ValidationPlot:
+    def __init__(self, scores_df, title):
+        data = []
+
+        for column in scores_df:
+            trace = go.Box(
+                y=scores_df[column],
+                name=column
+            )
+            data.append(trace)
+
+        layout = go.Layout(
+            title=go.layout.Title(
+                text=title
+            ),
+            xaxis=go.layout.XAxis(
+                title=go.layout.xaxis.Title(
+                    text='Properties'
+                )
+            ),
+            yaxis=go.layout.YAxis(
+                title=go.layout.yaxis.Title(
+                    text='Validation Scoring'
+                )
+            )
+        )
+
+        fig = go.Figure(data=data, layout=layout)
+
+        self.html_string = plot(fig, output_type='div')
+
+    def get_html_string(self):
+        return self.html_string

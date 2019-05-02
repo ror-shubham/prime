@@ -14,7 +14,7 @@ from utils.commons import show_message_dialog, add_html_to_browser_page
 
 from plots.log_plot import PlotLog
 from plots.correlation_plot import SelectCorrelationPlotField, PlotCorrelation
-from plots.plot_3d import plot_3d
+from plots.plot_3d import plot_3d, Plot3dDlg
 from plots.overlay_plot import SetOverlayProperties, PlotOverlaySet
 from plots.cross_plot import PlotCross, SetCrossPlotProperties
 
@@ -24,7 +24,7 @@ from sklearn.ensemble import RandomForestRegressor
 from ui_main import ui
 from ui_main.las.load_las.well_select_dialog import SelectWellDialog
 from ui_main.tools.interpolate.petrophysics.prediction.prediction_dialog import PredictionDialog
-from ui_main.tools.interpolate.petrophysics.validation.validation_dialog import ValidationDialog
+from ui_main.tools.interpolate.petrophysics.validation.validation_dialog import ValidationDialog, ValidationPlot
 from ui_main.tools.interpolate.facies.facies_interpolate import facies_csv_dlg
 from ui_main.file.new_project import NewProjectDialog
 from ui_main.file.open_project import open_project_dlg
@@ -33,6 +33,25 @@ from ui_main.file.save_project import save_project_to_file
 from ui_main.plot_notebook import PlotNotebook
 
 from analysis.vshale import gr_analysis
+
+from sklearn.linear_model import LinearRegression, LogisticRegression, RandomizedLogisticRegression
+from sklearn.tree import DecisionTreeRegressor
+from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor, GradientBoostingRegressor
+from sklearn.svm import SVR
+from pykrige.rk import RegressionKriging
+
+string_to_method = {
+    'LinearRegression': LinearRegression,
+    'LogisticRegression': LogisticRegression,
+    'RandomizedLogisticRegression': RandomizedLogisticRegression,
+    'DecisionTreeRegressor': DecisionTreeRegressor,
+    'RandomForestRegressor': RandomForestRegressor,
+    'AdaBoostRegressor': AdaBoostRegressor,
+    'BaggingRegressor': BaggingRegressor,
+    'GradientBoostingRegressor': GradientBoostingRegressor,
+    'SVR': SVR,
+    'RegressionKriging': RegressionKriging
+}
 
 
 
@@ -59,6 +78,9 @@ class Frame(ui.MainFrame):
 
         self.plotter = PlotNotebook(self.panel_right)
         self.box_right.Add(self.plotter, 1, wx.EXPAND)
+
+    def set_statusbar_text(self, text):
+        self.statusbar.SetStatusText(text)
 
     def load_las_dlg(self, event):
         openFileDialog = wx.FileDialog(self, "Open", "", "",
@@ -179,7 +201,6 @@ class Frame(ui.MainFrame):
             show_message_dialog(self, 'Only one well should be selected for GR Plot',
                                 'Error', )
 
-
     def _get_common_fields(self):
         col_arr = []
         selected_list = self.get_selected_df_list()
@@ -213,40 +234,72 @@ class Frame(ui.MainFrame):
 
     def on_prediction(self, event):
         common_fields = self._get_common_fields()
-        dlg = PredictionDialog(self, common_fields)
+        dlg = PredictionDialog(self, common_fields, list(string_to_method.keys()))
         modal_val = dlg.ShowModal()
         if modal_val != wx.ID_OK:
             return
-        selected_prop = dlg.get_selected_property()
         selected_method = dlg.get_selected_method()
         num_wells = int(dlg.get_num_wells())
         selected_df_list = self.get_selected_df_list(with_lat_long=True)
         num_selected = len(selected_df_list)
-        if num_selected > 3:
+        if num_selected >= 3:
             try:
-                self.predicted_df = main.prediction(selected_df_list, selected_prop, num_wells, RandomForestRegressor)
-                self.statusbar.SetStatusText('Prediction completed')
+                self.set_statusbar_text('Prediction started')
+                self.predicted_df = main.prediction(selected_df_list, num_wells, string_to_method[selected_method])
+                self.set_statusbar_text('Prediction completed')
+                self.string_prediction = selected_method + " " + str(num_selected) + "wells"
             except Exception as e:
                 show_message_dialog(self, 'Prediction failed with error: ' + repr(e),
                                     'Error')
-                self.statusbar.SetStatusText('Prediction failed')
+                self.set_statusbar_text('Prediction failed')
         else:
             show_message_dialog(self, 'At least three wells should be selected for prediction',
                                 'Error')
 
-
     def on_validation(self, event):
         common_fields = self._get_common_fields()
-        dlg = ValidationDialog(self, common_fields)
+        dlg = ValidationDialog(self, common_fields, list(string_to_method.keys()))
         modal_val = dlg.ShowModal()
         if modal_val != wx.ID_OK:
             return
-        selected_prop = dlg.get_selected_property()
         selected_method = dlg.get_selected_method()
         selected_scoring = dlg.get_selected_scoring()
         selected_df_list = self.get_selected_df_list(with_lat_long=True)
-        scores = main.validation(selected_df_list, selected_prop, RandomForestRegressor, selected_scoring)
-        show_message_dialog(self, scores, 'Scores')
+        self.set_statusbar_text("Validation started")
+        scores_df = main.validation(selected_df_list, string_to_method[selected_method], selected_scoring)
+        self.set_statusbar_text("Validation Finished")
+        plt = ValidationPlot(scores_df, 'Title')
+        html_string = plt.get_html_string()
+        add_html_to_browser_page(
+            self.panel_right,
+            self.plotter, html_string,
+            "Scoring " + selected_method + " " + selected_scoring
+        )
+        self.set_statusbar_text("Plot Successful")
+
+    def on_3d_plot(self, event):
+        props = self._get_common_fields()
+        dlg = Plot3dDlg(self, props)
+        val = dlg.ShowModal()
+        if val == wx.ID_OK:
+            prop_to_plot = dlg.get_selection()
+            try:
+                self.set_statusbar_text("3d Plotting started")
+                plot_3d(
+                    self.plotter,
+                    self.predicted_df,
+                    prop_to_plot,
+                    "3d plot "+ self.string_prediction
+                )
+                self.set_statusbar_text("3d Plotting started")
+            except AttributeError:
+                self.set_statusbar_text("3d Plotting failed")
+                show_message_dialog(
+                    self,
+                    'Please run prediction first. Currently, '
+                    '3d plot runs only in conjecture of prediction',
+                    'Error')
+
 
     def on_interpolate_facies(self, event):
         df_arr = self.get_selected_df_list()
@@ -276,13 +329,6 @@ class Frame(ui.MainFrame):
     def save_project(self, event):
         wells_modified = {k: list(map(lambda x: x.read_path, v)) for k, v in self.wells.items()}
         save_project_to_file(wells_modified, self.project_path)
-
-    def on_3d_plot(self, event):
-        try:
-            plot_3d(self.plotter, self.predicted_df)
-        except AttributeError:
-            show_message_dialog(self, 'Please run prediction first. Currently, 3d '
-                                      'plot runs only in conjecture of prediction', 'Error')
 
 
 def on_timer(_):
