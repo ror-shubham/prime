@@ -26,8 +26,11 @@ class MainFrame(wx.Frame):
         self.menubar.Append(self.file_menu, u"File")
 
         self.las_menu = wx.Menu()
-        self.load_menu = wx.MenuItem(self.las_menu, wx.ID_ANY, u"Load LAS")
-        self.las_menu.Append(self.load_menu)
+        self.load_las_menu = wx.MenuItem(self.las_menu, wx.ID_ANY, u"Load LAS")
+        self.las_menu.Append(self.load_las_menu)
+        self.remove_las_menu = wx.MenuItem(self.las_menu, wx.ID_ANY, u"Remove LAS")
+        self.las_menu.Append(self.remove_las_menu)
+
         self.menubar.Append(self.las_menu, u"LAS")
 
         self.tools_menu = wx.Menu()
@@ -104,7 +107,8 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.save_project, id=self.save_project_menu.GetId())
         self.Bind(wx.EVT_MENU, self.open_project, id=self.open_project_menu.GetId())
 
-        self.Bind(wx.EVT_MENU, self.load_las_dlg, id=self.load_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.load_las_dlg, id=self.load_las_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.remove_las_dlg, id=self.remove_las_menu.GetId())
 
         self.Bind(wx.EVT_MENU, self.plot_log, id=self.log_plot_menu.GetId())
         self.Bind(wx.EVT_MENU, self.correlation_plot, id=self.correlation_plot_menu.GetId())
@@ -129,6 +133,9 @@ class MainFrame(wx.Frame):
         event.Skip()
 
     def load_las_dlg(self, event):
+        event.Skip()
+
+    def remove_las_dlg(self, event):
         event.Skip()
 
     def plot_log(self, event):

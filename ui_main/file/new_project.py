@@ -13,7 +13,7 @@ class NewProjectDialog(wx.Dialog):
         self.home_dir = os.path.join(os.path.expanduser('~'), 'PrimeProjects')
         pathlib.Path(self.home_dir).mkdir(parents=True, exist_ok=True)
 
-        wx.Dialog.__init__(self, parent, title="Set Project Name")
+        wx.Dialog.__init__(self, parent, title="Set Project Name", style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER)
 
         box_main = wx.BoxSizer(wx.VERTICAL)
         box_name = wx.BoxSizer(wx.HORIZONTAL)

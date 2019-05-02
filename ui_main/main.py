@@ -1,5 +1,6 @@
 import pickle
 from cefpython3 import cefpython as cef
+import ntpath
 
 import wx
 import wx.html2
@@ -60,18 +61,18 @@ class Frame(ui.MainFrame):
         self.box_right.Add(self.plotter, 1, wx.EXPAND)
 
     def load_las_dlg(self, event):
-        dlg = SelectWellDialog(self, list(self.wells.keys()))
-        dlg.SetSize(250, -1)
-        dlg.CenterOnScreen()
-        val = dlg.ShowModal()
-        if val != wx.ID_OK:
-            return
-        well_name = dlg.get_well_name()
         openFileDialog = wx.FileDialog(self, "Open", "", "",
                                        "LAS files (*.las)|*.las",
                                        wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
         openFileDialog.ShowModal()
         path = openFileDialog.GetPath()
+        file_name = ntpath.basename(path)[:-4]  # [:-4] remove .las extension from filename
+        dlg = SelectWellDialog(self, list(self.wells.keys()), file_name)
+        dlg.CenterOnScreen()
+        val = dlg.ShowModal()
+        if val != wx.ID_OK:
+            return
+        well_name = dlg.get_well_name()
         self.load_las_logic(path, well_name)
 
     def load_las_logic(self, path, well_name):
@@ -260,7 +261,6 @@ class Frame(ui.MainFrame):
 
     def new_project(self, event):
         dlg = NewProjectDialog(self)
-        dlg.SetSize(450, 80)
         dlg.CenterOnScreen()
         val = dlg.ShowModal()
         if val != wx.ID_OK:

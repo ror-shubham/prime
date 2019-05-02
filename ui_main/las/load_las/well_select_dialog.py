@@ -4,7 +4,7 @@ import wx.xrc
 
 class SelectWellDialog(wx.Dialog):
 
-    def __init__(self, parent, choices):
+    def __init__(self, parent, choices, default_name):
         wx.Dialog.__init__(self, parent, title="Select Well ID")
 
         box_main = wx.BoxSizer(wx.VERTICAL)
@@ -15,7 +15,7 @@ class SelectWellDialog(wx.Dialog):
 
         box_well_id.Add(self.static_well, 0, wx.ALIGN_CENTER | wx.ALL, 5)
 
-        self.combo_box = wx.ComboBox(self, value="Type or Select existing!", choices=choices)
+        self.combo_box = wx.ComboBox(self, value=default_name, choices=choices)
         box_well_id.Add(self.combo_box, 1, wx.EXPAND | wx.ALIGN_CENTER_HORIZONTAL | wx.ALL, 5)
 
         box_main.Add(box_well_id, 1, wx.EXPAND, 5)
