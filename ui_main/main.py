@@ -19,13 +19,13 @@ from plots.overlay_plot import SetOverlayProperties, PlotOverlaySet
 from plots.cross_plot import PlotCross, SetCrossPlotProperties
 
 from ml import main
-from sklearn.ensemble import RandomForestRegressor
+from ml.facies_prediction import facies_prediction
 
 from ui_main import ui
 from ui_main.las.load_las.well_select_dialog import SelectWellDialog
 from ui_main.tools.interpolate.petrophysics.prediction.prediction_dialog import PredictionDialog
 from ui_main.tools.interpolate.petrophysics.validation.validation_dialog import ValidationDialog, ValidationPlot
-from ui_main.tools.interpolate.facies.facies_interpolate import facies_csv_dlg
+from ui_main.tools.interpolate.facies.facies_interpolate import facies_csv_dlg, plot_3d_facies
 from ui_main.file.new_project import NewProjectDialog
 from ui_main.file.open_project import open_project_dlg
 from ui_main.initial_dialog import InitialDialog
@@ -300,13 +300,17 @@ class Frame(ui.MainFrame):
                     '3d plot runs only in conjecture of prediction',
                     'Error')
 
-
     def on_interpolate_facies(self, event):
-        df_arr = self.get_selected_df_list()
+        df_arr = self.get_selected_df_list(with_lat_long=True)
         num_selected = len(df_arr)
         if num_selected == 1:
+            selected_df = df_arr[0]
             facies_path = facies_csv_dlg(self)
             facies_df = pd.read_csv(facies_path)
+            self.set_statusbar_text("Facies prediction started")
+            predicted_df_facies = facies_prediction(selected_df, facies_df, self.predicted_df, algorithm=GradientBoostingRegressor)
+            self.set_statusbar_text("Facies prediction completed")
+            plot_3d_facies(self.plotter, predicted_df_facies)
             #some_func
         else:
             show_message_dialog(self, 'Only one well should be selected for Facies plot',
