@@ -1,7 +1,6 @@
 import os
 import wx
 
-from utils.chromium_panel import ChromiumPanel
 from plotly.offline import plot
 import plotly.graph_objs as go
 
@@ -49,7 +48,7 @@ class Plot3dDlg(wx.Dialog):
         return self.choice_prop.GetStringSelection()
 
 
-def plot_3d(plotter, data, prop_to_plot, title):
+def plot_3d(data, prop_to_plot):
     data = data.sample(frac=0.01)
     # # TODO make the sample taking dynamic based on data size
     x = data.lat
@@ -96,7 +95,5 @@ def plot_3d(plotter, data, prop_to_plot, title):
     home_dir = os.path.expanduser('~')
     prime_dir = os.path.join(home_dir, 'PrimeProjects')
     html_dir = prime_dir if os.path.exists(prime_dir) else home_dir
-    html_file_path = plot(fig, filename=os.path.join(html_dir, 'temp.html'), auto_open=False)
+    return plot(fig, filename=os.path.join(html_dir, 'temp.html'), auto_open=False)
 
-    pnl = ChromiumPanel(plotter.nb, html_file_path)
-    plotter.nb.AddPage(pnl, title)

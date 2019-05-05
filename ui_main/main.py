@@ -3,7 +3,6 @@ from cefpython3 import cefpython as cef
 import ntpath
 
 import wx
-import wx.html2
 import numpy as np
 import wx.lib.inspection
 
@@ -119,8 +118,9 @@ class Frame(ui.MainFrame):
         if num_selected == 1:
             df = selected[0]
             plt_log_obj = PlotLog(df)
-            html_string = plt_log_obj.get_html_string()
-            add_html_to_browser_page(self.panel_right, self.plotter, html_string, "Log Plot")
+            html_file_path = plt_log_obj.get_html_file_path()
+
+            add_html_to_browser_page(self.panel_right, self.plotter, html_file_path, "Log Plot")
         else:
             show_message_dialog(self, 'Only one well should be selected for Log Plot',
                                 'Error', )
@@ -145,8 +145,8 @@ class Frame(ui.MainFrame):
                 return
             choice_field = dlg.get_selection()
             plot_obj = PlotCorrelation(self.panel_right, self.plotter, df_arr, choice_field, well_names)
-            html_string = plot_obj.get_html_string()
-            add_html_to_browser_page(self.panel_right, self.plotter, html_string, "Correlation plot")
+            html_file_path = plot_obj.get_html_file_path()
+            add_html_to_browser_page(self.panel_right, self.plotter, html_file_path, "Correlation plot")
 
     def overlay_plot(self, event):
         df_arr = self.get_selected_df_list()
@@ -161,8 +161,8 @@ class Frame(ui.MainFrame):
                 return
             props_to_relate = dlg.get_selection()
             plot_obj = PlotOverlaySet(self.panel_right, self.plotter, df, props_to_relate)
-            html_string = plot_obj.get_html_string()
-            add_html_to_browser_page(self.panel_right, self.plotter, html_string, "Overlay plot")
+            html_file_path = plot_obj.get_html_file_path()
+            add_html_to_browser_page(self.panel_right, self.plotter, html_file_path, "Overlay plot")
         else:
             show_message_dialog(self, 'Only one well should be selected for Overlay Plot',
                                 'Error', )
@@ -180,8 +180,8 @@ class Frame(ui.MainFrame):
                 return
             props_to_relate = dlg.get_selection()
             plot_cross = PlotCross(df, props_to_relate)
-            html_string = plot_cross.get_html_string()
-            add_html_to_browser_page(self.panel_right, self.plotter, html_string, "Cross Plot")
+            html_file_path = plot_cross.get_html_file_path()
+            add_html_to_browser_page(self.panel_right, self.plotter, html_file_path, "Cross Plot")
         else:
             show_message_dialog(self, 'Only one well should be selected for Overlay Plot', 'Error')
 
@@ -195,8 +195,8 @@ class Frame(ui.MainFrame):
                 return
             gr_min_max = dlg.get_min_max()
             plot_obj = gr_analysis.GrAnalysis(df_arr[0], gr_min_max)
-            html_string = plot_obj.get_html_string()
-            add_html_to_browser_page(self.panel_right, self.plotter, html_string, "GR Plot")
+            html_file_path = plot_obj.get_html_file_path()
+            add_html_to_browser_page(self.panel_right, self.plotter, html_file_path, "GR Plot")
         else:
             show_message_dialog(self, 'Only one well should be selected for GR Plot',
                                 'Error', )
@@ -268,11 +268,11 @@ class Frame(ui.MainFrame):
         self.set_statusbar_text("Validation started")
         scores_df = main.validation(selected_df_list, string_to_method[selected_method], selected_scoring)
         self.set_statusbar_text("Validation Finished")
-        plt = ValidationPlot(scores_df, 'Title')
-        html_string = plt.get_html_string()
+        plt = ValidationPlot(scores_df, 'Scoring plot')
+        html_file_path = plt.get_html_file_path()
         add_html_to_browser_page(
             self.panel_right,
-            self.plotter, html_string,
+            self.plotter, html_file_path,
             "Scoring " + selected_method + " " + selected_scoring
         )
         self.set_statusbar_text("Plot Successful")
@@ -285,13 +285,9 @@ class Frame(ui.MainFrame):
             prop_to_plot = dlg.get_selection()
             try:
                 self.set_statusbar_text("3d Plotting started")
-                plot_3d(
-                    self.plotter,
-                    self.predicted_df,
-                    prop_to_plot,
-                    "3d plot "+ self.string_prediction
-                )
-                self.set_statusbar_text("3d Plotting started")
+                html_file_path = plot_3d(self.predicted_df, prop_to_plot)
+                add_html_to_browser_page(self.panel_right, self.plotter, html_file_path, self.string_prediction)
+                self.set_statusbar_text("3d Plotting completed")
             except AttributeError:
                 self.set_statusbar_text("3d Plotting failed")
                 show_message_dialog(
@@ -311,7 +307,6 @@ class Frame(ui.MainFrame):
             predicted_df_facies = facies_prediction(selected_df, facies_df, self.predicted_df, algorithm=GradientBoostingRegressor)
             self.set_statusbar_text("Facies prediction completed")
             plot_3d_facies(self.plotter, predicted_df_facies)
-            #some_func
         else:
             show_message_dialog(self, 'Only one well should be selected for Facies plot',
                                 'Error', )

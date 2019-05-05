@@ -24,14 +24,23 @@ if MAC:
 class ChromiumPanel(wx.Panel):
     def __init__(self, parent, html_file_path):
         self.html_file_path = html_file_path
-        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY,
-                          )
+        wx.Panel.__init__(self, parent=parent, id=wx.ID_ANY)
 
         self.browser = None
-        settings = {}
+        settings = {
+            'context_menu': {
+                'navigation': False,
+                'print': False,
+                'devtools': False,
+                'view_source': False,
+                'external_browser': True
+            }}
         if MAC:
             settings["external_message_pump"] = True
         cef.Initialize(settings=settings)
+
+        self.Bind(wx.EVT_SIZE, self.OnSize)
+
 
         if MAC:
             NSApp.windows()[0].contentView().setWantsLayer_(True)
@@ -49,6 +58,18 @@ class ChromiumPanel(wx.Panel):
         self.browser = cef.CreateBrowserSync(window_info,
                                              url="file://"+self.html_file_path)
         self.browser.SetClientHandler(FocusHandler())
+
+    def OnSize(self, _):
+        if not self.browser:
+            return
+        if WINDOWS:
+            cef.WindowUtils.OnSize(self.GetHandle(),
+                                   0, 0, 0)
+        elif LINUX:
+            (x, y) = (0, 0)
+            (width, height) = self.GetSize().Get()
+            self.browser.SetBounds(x, y, width, height)
+        self.browser.NotifyMoveOrResizeStarted()
 
 
 class FocusHandler(object):

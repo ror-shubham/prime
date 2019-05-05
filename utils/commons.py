@@ -1,5 +1,6 @@
 import wx
-import wx.html2
+
+from utils.chromium_panel import ChromiumPanel
 
 
 def show_message_dialog(parent, message, title):
@@ -11,8 +12,8 @@ def show_message_dialog(parent, message, title):
     dlg.ShowModal()
     dlg.Destroy()
 
-def add_html_to_browser_page(parent, plotter, html_string, title):
-    browser = wx.html2.WebView.New(parent)
-    browser.SetPage(html_string, "")
-    plotter.nb.AddPage(browser, title)
+
+def add_html_to_browser_page(parent, plotter, html_file_path, title):
+    pnl = ChromiumPanel(plotter.nb, html_file_path)
+    plotter.nb.AddPage(pnl, title, select=True)
     parent.Layout()

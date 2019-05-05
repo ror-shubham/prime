@@ -1,4 +1,5 @@
 # source of formulae https://www.cgg.com/data/1/rec_docs/883_shale_volume_calculation.pdf
+import os
 
 from plotly import tools
 import plotly.graph_objs as go
@@ -7,8 +8,8 @@ import plotly.figure_factory as ff
 
 import numpy as np
 import wx
-import wx.html2
 
+from utils.chromium_panel import ChromiumPanel
 
 
 class GrAnalysis(object):
@@ -76,10 +77,13 @@ class GrAnalysis(object):
                         y=1, ),
             hovermode='closest'
         )
-        self.html_string = plot(fig, output_type='div')
+        home_dir = os.path.expanduser('~')
+        prime_dir = os.path.join(home_dir, 'PrimeProjects')
+        html_dir = prime_dir if os.path.exists(prime_dir) else home_dir
+        self.html_file_path = plot(fig, filename=os.path.join(html_dir, 'temp.html'), auto_open=False)
 
-    def get_html_string(self):
-        return self.html_string
+    def get_html_file_path(self):
+        return self.html_file_path
 
 
 class GrMinMaxSelect(wx.Dialog):
@@ -94,16 +98,8 @@ class GrMinMaxSelect(wx.Dialog):
         wx.Dialog.__init__(self, None, style=wx.DEFAULT_DIALOG_STYLE | wx.RESIZE_BORDER, size=(700, 700))
 
         hbox = wx.BoxSizer(wx.VERTICAL)
-
-        htmlSizer = wx.BoxSizer(wx.VERTICAL)
-        htmlPanel = wx.Panel(self, wx.ID_ANY, wx.DefaultPosition)
-        browser = wx.html2.WebView.New(htmlPanel)
-        html_string = get_html_distribution(gr_nd_arr)
-        browser.SetPage(html_string, "")
-        htmlSizer.Add(browser, 1, wx.EXPAND)
-        htmlPanel.SetSizer(htmlSizer)
-        htmlSizer.Fit(htmlPanel)
-
+        html_file_path = get_html_distribution_path(gr_nd_arr)
+        htmlPanel = ChromiumPanel(self, html_file_path)
         hbox.Add(htmlPanel, 1, wx.EXPAND | wx.ALL, 5)
 
         sizer_local4 = wx.BoxSizer(wx.VERTICAL)
@@ -141,11 +137,14 @@ class GrMinMaxSelect(wx.Dialog):
         return gr_min, gr_max
 
 
-def get_html_distribution(gr_nd_arr):
+def get_html_distribution_path(gr_nd_arr):
     y = gr_nd_arr[~np.isnan(gr_nd_arr)]
 
     hist_data = [y]
     group_labels = ['GR dist plot']
 
     fig = ff.create_distplot(hist_data, group_labels)
-    return plot(fig, output_type='div')
+    home_dir = os.path.expanduser('~')
+    prime_dir = os.path.join(home_dir, 'PrimeProjects')
+    html_dir = prime_dir if os.path.exists(prime_dir) else home_dir
+    return plot(fig, filename=os.path.join(html_dir, 'temp.html'), auto_open=False)

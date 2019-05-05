@@ -1,3 +1,5 @@
+import os
+
 import wx
 import wx.xrc
 
@@ -94,7 +96,10 @@ class ValidationPlot:
 
         fig = go.Figure(data=data, layout=layout)
 
-        self.html_string = plot(fig, output_type='div')
+        home_dir = os.path.expanduser('~')
+        prime_dir = os.path.join(home_dir, 'PrimeProjects')
+        html_dir = prime_dir if os.path.exists(prime_dir) else home_dir
+        self.html_file_path = plot(fig, filename=os.path.join(html_dir, 'temp.html'), auto_open=False)
 
-    def get_html_string(self):
-        return self.html_string
+    def get_html_file_path(self):
+        return self.html_file_path

@@ -1,7 +1,8 @@
+import os
+
 from utils.commons import show_message_dialog
 
 import wx
-import wx.html2
 
 import plotly.graph_objs as go
 from plotly.offline import plot
@@ -89,7 +90,10 @@ class PlotCross(object):
                         y=1, ),
             hovermode='closest'
         )
-        self.html_string = plot(fig, output_type='div')
+        home_dir = os.path.expanduser('~')
+        prime_dir = os.path.join(home_dir, 'PrimeProjects')
+        html_dir = prime_dir if os.path.exists(prime_dir) else home_dir
+        self.html_file_path = plot(fig, filename=os.path.join(html_dir, 'temp.html'), auto_open=False)
 
-    def get_html_string(self):
-        return self.html_string
+    def get_html_file_path(self):
+        return self.html_file_path
