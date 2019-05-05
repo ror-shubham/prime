@@ -185,6 +185,27 @@ class Frame(ui.MainFrame):
         else:
             show_message_dialog(self, 'Only one well should be selected for Overlay Plot', 'Error')
 
+    def on_plot_3d(self, event):
+        # TODO clean this code
+        props = self._get_common_fields()
+        dlg = Plot3dDlg(self, props)
+        val = dlg.ShowModal()
+        df_list = self.get_selected_df_list(with_lat_long=True)
+        cols = self._get_common_fields() + ['lat', 'long', 'DEPTH']
+        dum_lst = []
+        for df in df_list:
+            df['DEPTH'] = df.index
+            df_1 = df[cols]
+            dum_lst.append(df_1)
+        fn = pd.concat(dum_lst)
+        if val == wx.ID_OK:
+            prop_to_plot = dlg.get_selection()
+            self.set_statusbar_text("3d Plotting started")
+            html_file_path = plot_3d(fn, prop_to_plot)
+            add_html_to_browser_page(self.panel_right, self.plotter, html_file_path, "3d plot " + prop_to_plot + " " + str(len(df_list)) + " wells")
+            self.set_statusbar_text("3d Plotting completed")
+
+
     def on_gr_vshale(self, event):
         df_arr = self.get_selected_df_list()
         num_selected = len(df_arr)
@@ -277,7 +298,7 @@ class Frame(ui.MainFrame):
         )
         self.set_statusbar_text("Plot Successful")
 
-    def on_3d_plot(self, event):
+    def on_3d_interpolate_plot(self, event):
         props = self._get_common_fields()
         dlg = Plot3dDlg(self, props)
         val = dlg.ShowModal()

@@ -8,7 +8,7 @@ import wx.lib.agw.customtreectrl as CT
 class MainFrame(wx.Frame):
     def __init__(self, parent, project_path):
         project_name = os.path.basename(project_path)[:-6]  # [:-6] remove '.prime' from name
-        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=u"First frame", pos=wx.DefaultPosition,
+        wx.Frame.__init__(self, parent, id=wx.ID_ANY, title=u"PRIME", pos=wx.DefaultPosition,
                           size=wx.Size(500, 300), style=wx.DEFAULT_FRAME_STYLE | wx.TAB_TRAVERSAL)
 
         # MenuBar
@@ -44,6 +44,8 @@ class MainFrame(wx.Frame):
         self.plot_menu.Append(self.overlay_plot_menu)
         self.cross_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Cross Plot")
         self.plot_menu.Append(self.cross_plot_menu)
+        self.plot_3d_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"3d Plot")
+        self.plot_menu.Append(self.plot_3d_menu)
         self.tools_menu.AppendSubMenu(self.plot_menu, u"Plot")
 
         self.interpolation_menu = wx.Menu()
@@ -53,8 +55,8 @@ class MainFrame(wx.Frame):
         self.petrophysics_menu.Append(self.validation_menu)
         self.prediction_menu = wx.MenuItem(self.petrophysics_menu, wx.ID_ANY, u"Prediction")
         self.petrophysics_menu.Append(self.prediction_menu)
-        self.plot_3d_menu = wx.MenuItem(self.petrophysics_menu, wx.ID_ANY, u"3d Plot")
-        self.petrophysics_menu.Append(self.plot_3d_menu)
+        self.plot_3d_interpolate_menu = wx.MenuItem(self.petrophysics_menu, wx.ID_ANY, u"3d Plot")
+        self.petrophysics_menu.Append(self.plot_3d_interpolate_menu)
         self.tools_menu.AppendSubMenu(self.interpolation_menu, u"Interpolate")
 
         self.facies_menu = wx.Menu()
@@ -114,10 +116,11 @@ class MainFrame(wx.Frame):
         self.Bind(wx.EVT_MENU, self.correlation_plot, id=self.correlation_plot_menu.GetId())
         self.Bind(wx.EVT_MENU, self.overlay_plot, id=self.overlay_plot_menu.GetId())
         self.Bind(wx.EVT_MENU, self.cross_plot, id=self.cross_plot_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.on_plot_3d, id=self.plot_3d_menu.GetId())
 
         self.Bind(wx.EVT_MENU, self.on_prediction, id=self.prediction_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_validation, id=self.validation_menu.GetId())
-        self.Bind(wx.EVT_MENU, self.on_3d_plot, id=self.plot_3d_menu.GetId())
+        self.Bind(wx.EVT_MENU, self.on_3d_interpolate_plot, id=self.plot_3d_interpolate_menu.GetId())
         self.Bind(wx.EVT_MENU, self.on_interpolate_facies, id=self.interpolate_facies.GetId())
 
         self.Bind(wx.EVT_MENU, self.on_gr_vshale, id=self.gr_vshale_menu.GetId())
@@ -150,6 +153,9 @@ class MainFrame(wx.Frame):
     def cross_plot(self, event):
         event.Skip()
 
+    def on_plot_3d(self, event):
+        event.Skip()
+
     def add_well(self, tree, name):
         return self.left_tree.AppendItem(self.root, name, ct_type=1)
 
@@ -162,7 +168,7 @@ class MainFrame(wx.Frame):
     def on_validation(self, event):
         event.Skip()
 
-    def on_3d_plot(self, event):
+    def on_3d_interpolate_plot(self, event):
         event.Skip()
 
     def on_interpolate_facies(self, event):
