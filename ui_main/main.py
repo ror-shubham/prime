@@ -38,6 +38,7 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.ensemble import RandomForestRegressor, AdaBoostRegressor, BaggingRegressor, GradientBoostingRegressor
 from sklearn.svm import SVR
 from pykrige.rk import RegressionKriging
+from sklearn.neighbors import KNeighborsRegressor
 
 string_to_method = {
     'LinearRegression': LinearRegression,
@@ -49,7 +50,8 @@ string_to_method = {
     'BaggingRegressor': BaggingRegressor,
     'GradientBoostingRegressor': GradientBoostingRegressor,
     'SVR': SVR,
-    'RegressionKriging': RegressionKriging
+    'RegressionKriging': RegressionKriging,
+    'IDW': KNeighborsRegressor
 }
 
 
