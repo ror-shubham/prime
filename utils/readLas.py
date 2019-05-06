@@ -63,9 +63,35 @@ class ReadLas:
                     elif section == 'w':
                         column = line.split('.')[0].strip().lower()
                         if column == 'lati':
-                            self.lat = float(line.split('.', maxsplit=1)[1].split(':')[0].strip())
+                            try:
+                                self.lat = float(line.split('.', maxsplit=1)[1].split(':')[0].strip())
+                            except ValueError:
+                                # latitude in degree and minutes
+                                splits =  line.split('.', maxsplit=1)[1].split(':')[0].strip().split()
+                                degrees = float(splits[0])
+                                mins = float(splits[1][:-1])
+                                secs = float(splits[1][:-1])
+                                is_south = splits[3].lower() == 's'
+                                lat_abs = degrees + (mins/60) + (secs/3600)
+                                if is_south:
+                                    self.lat = -1 * lat_abs
+                                else:
+                                    self.lat = lat_abs
                         elif column == 'long':
-                            self.long = float(line.split('.', maxsplit=1)[1].split(':')[0].strip())
+                            try:
+                                self.long = float(line.split('.', maxsplit=1)[1].split(':')[0].strip())
+                            except ValueError:
+                                # latitude in degree and minutes
+                                splits = line.split('.', maxsplit=1)[1].split(':')[0].strip().split()
+                                degrees = float(splits[0])
+                                mins = float(splits[1][:-1])
+                                secs = float(splits[1][:-1])
+                                is_west = splits[3].lower() =='w'
+                                long_abs = degrees + (mins / 60) + (secs / 3600)
+                                if is_west:
+                                    self.long = -1 * long_abs
+                                else:
+                                    self.long = long_abs
         return columns
 
     def get_begin_depth(self):

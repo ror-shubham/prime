@@ -60,7 +60,6 @@ class Frame(ui.MainFrame):
         self.wells = {}
         self.well_to_tree = {}
         self.selected_dict = {}
-        self.selected_df_list = []
         self.project_name = ''
         self.project_path = project_path
 
@@ -84,17 +83,19 @@ class Frame(ui.MainFrame):
     def load_las_dlg(self, event):
         openFileDialog = wx.FileDialog(self, "Open", "", "",
                                        "LAS files (*.las)|*.las",
-                                       wx.FD_OPEN | wx.FD_FILE_MUST_EXIST)
+                                       wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE)
         openFileDialog.ShowModal()
-        path = openFileDialog.GetPath()
-        file_name = ntpath.basename(path)[:-4]  # [:-4] remove .las extension from filename
-        dlg = SelectWellDialog(self, list(self.wells.keys()), file_name)
-        dlg.CenterOnScreen()
-        val = dlg.ShowModal()
-        if val != wx.ID_OK:
-            return
-        well_name = dlg.get_well_name()
-        self.load_las_logic(path, well_name)
+        path_list = openFileDialog.GetPaths()
+        for path in path_list:
+            num_err = 0
+            try:
+                file_name = ntpath.basename(path)[:-4]  # [:-4] remove .las extension from filename
+                self.load_las_logic(path, file_name)
+            except:
+                num_err += 1
+        show_message_dialog(self, 'Reading failed for' + str(num_err),
+                            'Warning')
+
 
     def load_las_logic(self, path, well_name):
         lasObj = ReadLas(path)
@@ -198,6 +199,7 @@ class Frame(ui.MainFrame):
             df_1 = df[cols]
             dum_lst.append(df_1)
         fn = pd.concat(dum_lst)
+        fn = fn.loc[:, ~fn.columns.duplicated()]
         if val == wx.ID_OK:
             prop_to_plot = dlg.get_selection()
             self.set_statusbar_text("3d Plotting started")
@@ -234,7 +236,7 @@ class Frame(ui.MainFrame):
         return common_list
 
     def get_selected_df_list(self, with_lat_long=False):
-        self.selected_df_list = []
+        selected_df_list = []
         self.selected_dict = {}
         for well_name in self.well_to_tree:
             tree = self.well_to_tree[well_name]
@@ -245,13 +247,13 @@ class Frame(ui.MainFrame):
                         to_append = self.wells[well_name][index].df
                     else:
                         to_append = self.wells[well_name][index].df.drop(columns =['lat', 'long'])
-                    self.selected_df_list.append(to_append)
+                    selected_df_list.append(to_append)
                     if well_name in self.selected_dict:
                         if index not in self.selected_dict[well_name]:
                             self.selected_dict[well_name].append(index)
                     else:
                         self.selected_dict[well_name] = [index]
-        return self.selected_df_list
+        return selected_df_list
 
     def on_prediction(self, event):
         common_fields = self._get_common_fields()

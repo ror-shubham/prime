@@ -76,7 +76,5 @@ class FocusHandler(object):
     def OnGotFocus(self, browser, **_):
         # Temporary fix for focus issues on Linux (Issue #284).
         if LINUX:
-            print("[wxpython.py] FocusHandler.OnGotFocus:"
-                  " keyboard focus fix (Issue #284)")
             browser.SetFocus(True)
 
