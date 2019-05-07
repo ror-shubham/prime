@@ -67,12 +67,14 @@ class Frame(ui.MainFrame):
 
         ui.MainFrame.__init__(self, parent, project_path)
         # read the project file first
+        self.set_statusbar_text("Prime started")
         try:
             with open(project_path, 'rb') as f:
                 well_path_dict = pickle.load(f)
             for well_name in well_path_dict:
                 for path in well_path_dict[well_name]:
                     self.load_las_logic(path, well_name)
+            self.set_statusbar_text("Project loaded")
         except:
             print('Error reading project data')
 
@@ -88,16 +90,16 @@ class Frame(ui.MainFrame):
                                        wx.FD_OPEN | wx.FD_FILE_MUST_EXIST | wx.FD_MULTIPLE)
         openFileDialog.ShowModal()
         path_list = openFileDialog.GetPaths()
+        num_err = 0
         for path in path_list:
-            num_err = 0
             try:
                 file_name = ntpath.basename(path)[:-4]  # [:-4] remove .las extension from filename
                 self.load_las_logic(path, file_name)
             except:
                 num_err += 1
-        show_message_dialog(self, 'Reading failed for' + str(num_err),
-                            'Warning')
-
+        if num_err:
+            show_message_dialog(self, 'Reading failed for' + str(num_err),
+                                'Warning')
 
     def load_las_logic(self, path, well_name):
         lasObj = ReadLas(path)
@@ -114,6 +116,7 @@ class Frame(ui.MainFrame):
         end = lasObj.get_end_depth()
         self.add_las_to_well(child_tree, str(beg) + " - " + str(end))
         self.left_tree.ExpandAll()
+        self.set_statusbar_text("Well loaded")
 
     def plot_log(self, event):
         selected = self.get_selected_df_list()
@@ -370,5 +373,5 @@ if __name__ == "__main__":
         frame.Bind(wx.EVT_TIMER, on_timer, timer)
         timer.Start(10)  # 10ms timer
         frame.Show(True)
-        wx.lib.inspection.InspectionTool().Show()
+        # wx.lib.inspection.InspectionTool().Show()
         app.MainLoop()

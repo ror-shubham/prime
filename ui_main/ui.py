@@ -33,7 +33,6 @@ class MainFrame(wx.Frame):
 
         self.menubar.Append(self.las_menu, u"LAS")
 
-        self.tools_menu = wx.Menu()
         self.plot_menu = wx.Menu()
 
         self.log_plot_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"Log Plot")
@@ -46,7 +45,7 @@ class MainFrame(wx.Frame):
         self.plot_menu.Append(self.cross_plot_menu)
         self.plot_3d_menu = wx.MenuItem(self.plot_menu, wx.ID_ANY, u"3d Plot")
         self.plot_menu.Append(self.plot_3d_menu)
-        self.tools_menu.AppendSubMenu(self.plot_menu, u"Plot")
+        self.menubar.Append(self.plot_menu, u"Plot")
 
         self.interpolation_menu = wx.Menu()
         self.petrophysics_menu = wx.Menu()
@@ -57,14 +56,12 @@ class MainFrame(wx.Frame):
         self.petrophysics_menu.Append(self.prediction_menu)
         self.plot_3d_interpolate_menu = wx.MenuItem(self.petrophysics_menu, wx.ID_ANY, u"3d Plot")
         self.petrophysics_menu.Append(self.plot_3d_interpolate_menu)
-        self.tools_menu.AppendSubMenu(self.interpolation_menu, u"Interpolate")
-
+        self.menubar.Append(self.interpolation_menu, u"Interpolate")
         self.facies_menu = wx.Menu()
         self.interpolation_menu.AppendSubMenu(self.facies_menu, u"Facies")
         self.interpolate_facies = wx.MenuItem(self.facies_menu, wx.ID_ANY, u"Interpolate")
         self.facies_menu.Append(self.interpolate_facies)
 
-        self.menubar.Append(self.tools_menu, u"Tools")
 
         self.analysis_menu = wx.Menu()
         self.vshale_menu = wx.Menu()

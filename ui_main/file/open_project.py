@@ -8,7 +8,7 @@ def open_project_dlg(parent):
     prime_dir = os.path.join(home_dir, 'PrimeProjects')
     dlg = wx.FileDialog(
         parent,
-        message="Create new prime project",
+        message="Open a prime project",
         defaultFile="",
         wildcard=wildcard,
         style=wx.FD_OPEN,
